@@ -6,22 +6,22 @@ namespace Curiosity.SPSS.FileParser.Records
 {
     public class VeryLongStringRecord : VariableDataInfoRecord<int>
     {
+        public VeryLongStringRecord(IDictionary<string, int> dictionary, Encoding encoding)
+            : base(dictionary, encoding)
+        {
+        }
+
         protected override bool UsesTerminator => true;
 
         public override int SubType => InfoRecordType.VeryLongString;
 
-        public VeryLongStringRecord(IDictionary<string, int> dictionary, Encoding encoding)
-            : base(dictionary, encoding)
-        {}
-
         protected override int DecodeValue(string stringValue)
         {
-            int lenght;
-            if(!int.TryParse(stringValue, out lenght))
-                throw new SpssFileFormatException("Couldn't read the size of the VeryLongString as interger. Value read was '"+
-                    (stringValue.Length > 80 ? stringValue.Substring(0, 77)+"..." : stringValue) + "'");
+            if (!int.TryParse(stringValue, out var length))
+                throw new SpssFileFormatException("Couldn't read the size of the VeryLongString as integer. Value read was '" +
+                                                  (stringValue.Length > 80 ? stringValue.Substring(0, 77) + "..." : stringValue) + "'");
 
-            return lenght;
+            return length;
         }
 
         protected override string EncodeValue(int value)

@@ -5,11 +5,11 @@ namespace Curiosity.SPSS.FileParser.Records
 {
     public abstract class BaseInfoRecord : EncodeEnabledRecord, IRecord
     {
-        public RecordType RecordType => RecordType.InfoRecord;
-        public abstract int SubType { get; }
+        protected int ItemCount;
 
         protected int ItemSize;
-        protected int ItemCount;
+        public abstract int SubType { get; }
+        public RecordType RecordType => RecordType.InfoRecord;
 
         public void WriteRecord(BinaryWriter writer)
         {
@@ -34,18 +34,12 @@ namespace Curiosity.SPSS.FileParser.Records
             metaData.InfoRecords.Add(this);
             Metadata = metaData;
         }
-        
+
         protected void CheckInfoHeader(int itemSize = -1, int itemCount = -1)
         {
-            if (itemSize >= 0 && itemSize != ItemSize)
-            {
-                throw new SpssFileFormatException($"Wrong info record subtype {ItemSize}. Expected {itemSize}.");
-            }
+            if (itemSize >= 0 && itemSize != ItemSize) throw new SpssFileFormatException($"Wrong info record subtype {ItemSize}. Expected {itemSize}.");
 
-            if (itemCount >= 0 && itemCount != ItemCount)
-            {
-                throw new SpssFileFormatException($"Wrong info record subtype {ItemCount}. Expected {itemCount}.");
-            }
+            if (itemCount >= 0 && itemCount != ItemCount) throw new SpssFileFormatException($"Wrong info record subtype {ItemCount}. Expected {itemCount}.");
         }
 
         protected abstract void WriteInfo(BinaryWriter writer);
@@ -54,47 +48,42 @@ namespace Curiosity.SPSS.FileParser.Records
 
     public class UnknownInfoRecord : BaseInfoRecord
     {
-        private readonly int _subType;
-
-        public byte[] Data { get; private set; }
-
         internal UnknownInfoRecord(int subType)
         {
-            _subType = subType;
+            SubType = subType;
         }
 
         internal UnknownInfoRecord(int subType, int itemSize, int itemCount)
         {
-            _subType = subType;
+            SubType = subType;
             ItemSize = itemSize;
             ItemCount = itemCount;
         }
 
-        public override int SubType => _subType;
+        public byte[] Data { get; private set; } = Array.Empty<byte>();
+
+        public override int SubType { get; }
+
+        public byte[] this[int i]
+        {
+            get
+            {
+                if (ItemSize * i > Data.Length) throw new IndexOutOfRangeException();
+                var result = new byte[ItemSize];
+                Buffer.BlockCopy(Data, i * ItemSize, result, 0, ItemSize);
+                return result;
+            }
+        }
 
         protected override void WriteInfo(BinaryWriter writer)
         {
-            // TODO: check data lenght
+            // TODO: check data length
             writer.Write(Data);
         }
 
         protected override void FillInfo(BinaryReader reader)
         {
             Data = reader.ReadBytes(ItemCount * ItemSize);
-        }
-
-        public byte[] this[int i]
-        {
-            get
-            {
-                if (ItemSize * i > Data.Length)
-                {
-                    throw new IndexOutOfRangeException();
-                }
-                byte[] result = new byte[ItemSize];
-                Buffer.BlockCopy(Data, i * ItemSize, result, 0, ItemSize);
-                return result;
-            }
         }
     }
 }

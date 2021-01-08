@@ -5,26 +5,21 @@ using System.Text;
 
 namespace Curiosity.SPSS.Compression
 {
-    class DecompressedDataStream: Stream
+    internal class DecompressedDataStream : Stream
     {
         private const int InstructionSetByteSize = 8;
-        private const int DataElementByteSize = 8;
-        const string SpaceString = "        ";
-        
-        public Stream CompressedDataStream { get; }
-        public double Bias { get; }
-        public double SystemMissing { get; }
-        
-        private long _position = 0;
-        private byte[][] _elementBuffer = new byte[8][];
-        private int _elementBufferPosition = 0;
+        private const string SpaceString = "        ";
+        private readonly byte[][] _elementBuffer = new byte[8][];
+
+        private readonly long _position = 0;
+
+        private readonly BinaryReader _reader;
+        private readonly byte[] _spacesBytes;
+
+        private readonly byte[] _systemMissingBytes;
+        private int _elementBufferPosition;
         private int _elementBufferSize;
-        private int _inElementPosition = 0; // for those rare cases where we end up in the middle of an element.
-
-        private byte[] _systemMissingBytes;
-        private byte[] _spacesBytes;
-
-        private BinaryReader _reader;
+        private int _inElementPosition; // for those rare cases where we end up in the middle of an element.
 
         public DecompressedDataStream(Stream compressedDataStream, double bias, double systemMissing)
         {
@@ -37,32 +32,27 @@ namespace Curiosity.SPSS.Compression
             _systemMissingBytes = BitConverter.GetBytes(SystemMissing);
         }
 
+        public Stream CompressedDataStream { get; }
+        public double Bias { get; }
+        public double SystemMissing { get; }
+
         public override bool CanRead => CompressedDataStream.CanRead;
 
         public override bool CanSeek => CompressedDataStream.CanSeek;
 
         public override bool CanWrite => CompressedDataStream.CanWrite;
 
-        public override void Flush()
-        {
-            CompressedDataStream.Flush();
-        }
-
-        public override long Length
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override long Length => throw new NotSupportedException();
 
         public override long Position
         {
-            get
-            {
-                return _position;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get => _position;
+            set => throw new NotSupportedException();
+        }
+
+        public override void Flush()
+        {
+            CompressedDataStream.Flush();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -70,66 +60,45 @@ namespace Curiosity.SPSS.Compression
             // Usually we can just send out the next 8-byte element.
             if (count == 8 && offset == 0 && _inElementPosition == 0)
             {
-                if (PreserveBuffer())
+                if (!PreserveBuffer()) return 0;
+                _elementBuffer[_elementBufferPosition++].CopyTo(buffer, offset);
+                return 8;
+
+                // End of stream:
+            }
+
+            // Else we have to run thru the bytes one by one:
+
+            for (var i = 0; i < count; i++)
+            {
+                // Check for the unlikely case that the byte-request runs over multiple elements
+                if (_inElementPosition == 8)
                 {
-                    _elementBuffer[_elementBufferPosition++].CopyTo(buffer, offset);
-                    return 8;
+                    // Flow over to next 8-byte element
+                    _elementBufferPosition++;
+                    _inElementPosition = 0;
                 }
+
+                if (PreserveBuffer())
+                    buffer[i + offset] = _elementBuffer[_elementBufferPosition][_inElementPosition];
                 else
-                {
                     // End of stream:
                     return 0;
-                }
             }
-            
-            // Else we have to run thru the bytes one by one:
-            else
-            {
-                for (int i = 0; i < count; i++)
-                {                   
-                    // Check for the unlikely case that the byte-request runs over multiple elements
-                    if (_inElementPosition == 8)
-                    {
-                        // Flow over to next 8-byte element
-                        _elementBufferPosition++;
-                        _inElementPosition = 0;
-                    }
-                    if (PreserveBuffer())
-                    {
-                        buffer[i + offset] = _elementBuffer[_elementBufferPosition][_inElementPosition];
-                    }
-                    else
-                    {
-                        // End of stream:
-                        return 0;
-                    }
-                }
-                return count;
-            }
+
+            return count;
         }
 
         private bool PreserveBuffer()
         {
             // Check whether the end of internal buffer is reached 
-            if (!(_elementBufferPosition < _elementBufferSize))
-            {
-                if (ParseNextInstructionSet())
-                {
-                    _elementBufferPosition = 0;
-                    return true;
-                }
-                else
-                {
-                    // End of stream
-                    return false;
-                }
-            }
+            if (_elementBufferPosition < _elementBufferSize) return true;
+            if (!ParseNextInstructionSet()) return false; // End of stream
+            _elementBufferPosition = 0;
             return true;
         }
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotSupportedException();
-        }
+
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
 
         public override void SetLength(long value)
         {
@@ -143,57 +112,56 @@ namespace Curiosity.SPSS.Compression
 
         private bool ParseNextInstructionSet()
         {
-            byte[] instructionSet = _reader.ReadBytes(InstructionSetByteSize);
+            var instructionSet = _reader.ReadBytes(InstructionSetByteSize);
 
             if (instructionSet.Length < InstructionSetByteSize)
-            {
                 // End of stream.
                 return false;
-            }
 
-            
-            List<int> uncompressedElementBufferPositions = new List<int>();
-            int bufferPosition = 0;
 
-            for (int i = 0; i < InstructionSetByteSize; i++)
+            var uncompressedElementBufferPositions = new List<int>();
+            var bufferPosition = 0;
+
+            for (var i = 0; i < InstructionSetByteSize; i++)
             {
                 int instruction = instructionSet[i];
 
-                if (instruction == 0) //padding
+                switch (instruction)
                 {
-                }
-
-                else if (instruction > 0 && instruction < 252) // compressed value
-                {
-                    // compute actual value:
-                    double value = instruction - Bias;
-                    _elementBuffer[bufferPosition++] = BitConverter.GetBytes(value);
-                }
-                else if (instruction == 252) // end of file
-                {
-                    _elementBufferSize = bufferPosition;
-                    return false;
-                }
-                else if (instruction == 253) // uncompressed value
-                {
-                    uncompressedElementBufferPositions.Add(bufferPosition++);
-                }
-                else if (instruction == 254) // space string
-                {
-                    _elementBuffer[bufferPosition++] = _spacesBytes;
-                }
-                else  if (instruction == 255) // system missing value
-                {
-                    _elementBuffer[bufferPosition++] = _systemMissingBytes;
+                    //padding
+                    case 0:
+                        break;
+                    // compressed value
+                    case > 0 and < 252:
+                    {
+                        // compute actual value:
+                        var value = instruction - Bias;
+                        _elementBuffer[bufferPosition++] = BitConverter.GetBytes(value);
+                        break;
+                    }
+                    // end of file
+                    case 252:
+                        _elementBufferSize = bufferPosition;
+                        return false;
+                    // uncompressed value
+                    case 253:
+                        uncompressedElementBufferPositions.Add(bufferPosition++);
+                        break;
+                    // space string
+                    case 254:
+                        _elementBuffer[bufferPosition++] = _spacesBytes;
+                        break;
+                    // system missing value
+                    case 255:
+                        _elementBuffer[bufferPosition++] = _systemMissingBytes;
+                        break;
                 }
             }
+
             _elementBufferSize = bufferPosition;
 
             // Read the uncompressed values (they follow after the instruction set):
-            foreach (int pos in uncompressedElementBufferPositions)
-            {
-                _elementBuffer[pos] = _reader.ReadBytes(8);
-            }
+            foreach (var pos in uncompressedElementBufferPositions) _elementBuffer[pos] = _reader.ReadBytes(8);
             return true;
         }
     }

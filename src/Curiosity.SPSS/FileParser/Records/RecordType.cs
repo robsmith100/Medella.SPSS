@@ -1,5 +1,4 @@
-﻿
-namespace Curiosity.SPSS.FileParser.Records
+﻿namespace Curiosity.SPSS.FileParser.Records
 {
     public enum RecordType
     {

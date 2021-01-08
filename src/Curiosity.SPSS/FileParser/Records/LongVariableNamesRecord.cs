@@ -5,11 +5,12 @@ namespace Curiosity.SPSS.FileParser.Records
 {
     public class LongVariableNamesRecord : VariableDataInfoRecord<string>
     {
-        public override int SubType => InfoRecordType.LongVariableNames;
-
-        public LongVariableNamesRecord(IDictionary<string, string> variableLongNames, Encoding encoding) 
+        public LongVariableNamesRecord(IDictionary<string, string?> variableLongNames, Encoding encoding)
             : base(variableLongNames, encoding)
-        {}
+        {
+        }
+
+        public override int SubType => InfoRecordType.LongVariableNames;
 
         public override void RegisterMetadata(MetaData metaData)
         {
@@ -17,14 +18,8 @@ namespace Curiosity.SPSS.FileParser.Records
             Metadata = metaData;
         }
 
-        protected override string DecodeValue(string stringValue)
-        {
-            return stringValue;
-        }
+        protected override string DecodeValue(string stringValue) => stringValue;
 
-        protected override string EncodeValue(string value)
-        {
-            return value;
-        }
+        protected override string EncodeValue(string value) => value;
     }
 }

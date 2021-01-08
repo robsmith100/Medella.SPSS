@@ -1,21 +1,22 @@
-﻿
-namespace Curiosity.SPSS.SpssDataset
+﻿namespace Curiosity.SPSS.SpssDataset
 {
     /// <summary>
-    /// The measurement type of the variable
+    ///     The measurement type of the variable
     /// </summary>
     public enum MeasurementType
     {
         /// <summary>
-        /// Nominal scale
+        ///     Nominal scale
         /// </summary>
         Nominal = 1,
+
         /// <summary>
-        /// Ordinal scale
+        ///     Ordinal scale
         /// </summary>
         Ordinal = 2,
+
         /// <summary>
-        /// Continuous scale
+        ///     Continuous scale
         /// </summary>
         Scale = 3
     }

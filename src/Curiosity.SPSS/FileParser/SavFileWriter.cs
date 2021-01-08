@@ -8,46 +8,53 @@ using Curiosity.SPSS.SpssDataset;
 
 namespace Curiosity.SPSS.FileParser
 {
-	public class SavFileWriter : IDisposable
-	{
-		private readonly Stream _output;
-		private readonly BinaryWriter _writer;
-		private Variable[] _variables;
-		private IRecordWriter _recordWriter;
-		private long _bias;
-		private bool _compress;
-	    private SpssOptions _options;
+    public class SavFileWriter : IDisposable
+    {
+        private readonly Stream _output;
+        private readonly BinaryWriter _writer;
+        private long _bias;
+        private bool _compress;
+        private SpssOptions? _options;
+        private IRecordWriter? _recordWriter;
 
-        private StringWriter _stringWriter;
+        private StringWriter? _stringWriter;
+        private Variable[]? _variables;
 
-		public SavFileWriter(Stream output)
-		{
-			_output = output;
-			_writer = new BinaryWriter(_output, Constants.BaseEncoding);
-		}
+        public SavFileWriter(Stream output)
+        {
+            _output = output;
+            _writer = new BinaryWriter(_output, Constants.BaseEncoding);
+        }
 
-	    public void WriteFileHeader(SpssOptions options, IEnumerable<Variable> variables)
-		{
-		    _options = options;
-			_compress = options.Compressed;
-			_bias = options.Bias;
-			_variables = variables.ToArray();
+        public void Dispose()
+        {
+            _writer.Flush();
+            _writer.Close();
+            _output.Dispose();
+        }
+
+        public void WriteFileHeader(SpssOptions options, IEnumerable<Variable> variables)
+        {
+            _options = options;
+            _compress = options.Compressed;
+            _bias = options.Bias;
+            _variables = variables.ToArray();
 
             // SPSS file header
             var headerRecords = new List<IRecord>
-	                            {
-	                                new HeaderRecord(options)
-	                            };
+            {
+                new HeaderRecord(options)
+            };
 
-	        // Process all variable info
-			var variableLongNames = new Dictionary<string, string>();
+            // Process all variable info
+            var variableLongNames = new Dictionary<string, string?>();
             var veryLongStrings = new Dictionary<string, int>();
-	        var displayInfoList = new List<VariableDisplayInfo>(_variables.Length);
+            var displayInfoList = new List<VariableDisplayInfo>(_variables.Length);
             SetVariables(headerRecords, variableLongNames, veryLongStrings, displayInfoList);
-            
-			// Integer & encoding info
-			var intInfoRecord = new MachineIntegerInfoRecord(_options.HeaderEncoding);
-			headerRecords.Add(intInfoRecord);
+
+            // Integer & encoding info
+            var intInfoRecord = new MachineIntegerInfoRecord(_options.HeaderEncoding);
+            headerRecords.Add(intInfoRecord);
 
             // Integer & encoding info
             var fltInfoRecord = new MachineFloatingPointInfoRecord();
@@ -55,19 +62,16 @@ namespace Curiosity.SPSS.FileParser
 
             // Variable Display info, beware that the number of variables here must match the count of named variables 
             // (exclude the string continuation, include VLS segments)
-	        var varDisplRecord = new VariableDisplayParameterRecord(displayInfoList.Count);
-	        for (int index = 0; index < displayInfoList.Count; index++)
-	        {
-	            varDisplRecord[index] = displayInfoList[index];
-	        }
-            headerRecords.Add(varDisplRecord);
+            var varDisplayRecord = new VariableDisplayParameterRecord(displayInfoList.Count);
+            for (var index = 0; index < displayInfoList.Count; index++) varDisplayRecord[index] = displayInfoList[index];
+            headerRecords.Add(varDisplayRecord);
 
-	        // Variable Long names (as info record)
-			if (variableLongNames.Any())
-			{
-				var longNameRecord = new LongVariableNamesRecord(variableLongNames, _options.HeaderEncoding);
-				headerRecords.Add(longNameRecord);
-			}
+            // Variable Long names (as info record)
+            if (variableLongNames.Any())
+            {
+                var longNameRecord = new LongVariableNamesRecord(variableLongNames, _options.HeaderEncoding);
+                headerRecords.Add(longNameRecord);
+            }
 
             if (veryLongStrings.Any())
             {
@@ -75,149 +79,127 @@ namespace Curiosity.SPSS.FileParser
                 headerRecords.Add(veryLongStringsRecord);
             }
 
-			// Char encoding info record (for data)
-			var charEncodingRecord = new CharacterEncodingRecord(_options.DataEncoding);
-			headerRecords.Add(charEncodingRecord);
-			
-			// End of the info records
-			headerRecords.Add(new DictionaryTerminationRecord());
+            // Char encoding info record (for data)
+            var charEncodingRecord = new CharacterEncodingRecord(_options.DataEncoding);
+            headerRecords.Add(charEncodingRecord);
 
-			// Write all of header, variable and info records
-			foreach (var headerRecord in headerRecords)
-			{
-				headerRecord.WriteRecord(_writer);
-			}
-            
+            // End of the info records
+            headerRecords.Add(new DictionaryTerminationRecord());
+
+            // Write all of header, variable and info records
+            foreach (var headerRecord in headerRecords) headerRecord.WriteRecord(_writer);
+
             if (_compress)
-            {
                 _recordWriter = new CompressedRecordWriter(_writer, _bias, double.MinValue);
-            }
             else
-            {
                 throw new NotImplementedException("Uncompressed SPSS data writing is not yet implemented. Please set compressed to true");
-            }
-            
-            _stringWriter = new StringWriter(_options.DataEncoding, _recordWriter);
-		}
 
-        private void SetVariables(List<IRecord> headerRecords, IDictionary<string, string> variableLongNames, IDictionary<string, int> veryLongStrings, List<VariableDisplayInfo> displayInfoList)
-		{
-			var variableRecords = new List<VariableRecord>(_variables.Length);
+            _stringWriter = new StringWriter(_options.DataEncoding, _recordWriter);
+        }
+
+        private void SetVariables(List<IRecord> headerRecords, IDictionary<string, string?> variableLongNames, IDictionary<string, int> veryLongStrings, List<VariableDisplayInfo> displayInfoList)
+        {
+            var variableRecords = new List<VariableRecord>(_variables!.Length);
             var valueLabels = new List<ValueLabel>(_variables.Length);
 
             // Read the variables and create the needed records
             ProcessVariables(variableLongNames, veryLongStrings, variableRecords, valueLabels);
-			headerRecords.AddRange(variableRecords);
-			
-			// Set the count of variables as "nominal case size" on the HeaderRecord
-			var header = headerRecords.OfType<HeaderRecord>().First();
-			header.NominalCaseSize = variableRecords.Count;
+            headerRecords.AddRange(variableRecords);
+
+            // Set the count of variables as "nominal case size" on the HeaderRecord
+            var header = headerRecords.OfType<HeaderRecord>().First();
+            header.NominalCaseSize = variableRecords.Count;
 
             var namedVariables = variableRecords.Where(v => v.DisplayInfo != null).ToList();
 
-            displayInfoList.AddRange(namedVariables.Select(variableRecord => variableRecord.DisplayInfo));
+            displayInfoList.AddRange(namedVariables.Select(variableRecord => variableRecord.DisplayInfo!));
 
 
             SetValueLabels(headerRecords, valueLabels);
-		}
+        }
 
-		private void SetValueLabels(List<IRecord> headerRecords, List<ValueLabel> valueLabels)
-		{
-			headerRecords.AddRange(valueLabels
-									.Select(vl => new ValueLabelRecord(vl, _options.HeaderEncoding)));
-		}
+        private void SetValueLabels(List<IRecord> headerRecords, List<ValueLabel> valueLabels)
+        {
+            headerRecords.AddRange(valueLabels
+                .Select(vl => new ValueLabelRecord(vl, _options!.HeaderEncoding)));
+        }
 
-        private void ProcessVariables(IDictionary<string, string> variableLongNames, IDictionary<string, int> veryLongStrings, List<VariableRecord> variableRecords, List<ValueLabel> valueLabels)
-		{
-            int longNameCounter = 0;
+        private void ProcessVariables(IDictionary<string, string?> variableLongNames, IDictionary<string, int> veryLongStrings, List<VariableRecord> variableRecords, List<ValueLabel> valueLabels)
+        {
+            var longNameCounter = 0;
             var namesList = new SortedSet<byte[]>(new ByteArrayComparer());
             var segmentsNamesList = new SortedList<byte[], int>(new ByteArrayComparer());
 
-            foreach (var variable in _variables)
-			{
-				int dictionaryIndex = variableRecords.Count + 1;
+            foreach (var variable in _variables!)
+            {
+                var dictionaryIndex = variableRecords.Count + 1;
 
-                var records = VariableRecord.GetNeededVariables(variable, _options.HeaderEncoding, namesList, ref longNameCounter, veryLongStrings, segmentsNamesList);
-				variableRecords.AddRange(records);
+                var records = VariableRecord.GetNeededVariables(variable, _options!.HeaderEncoding, namesList, ref longNameCounter, veryLongStrings, segmentsNamesList);
+                variableRecords.AddRange(records);
 
                 // Even if the variable name is the same, it still needs a long record indicator otherwise SPSS doesn't know how to handle it.
-				variableLongNames.Add(records[0].Name, variable.Name);
+                variableLongNames.Add(records[0].Name!, variable.Name);
 
-				// TODO Avoid repeating the same valueLabels on the file
-				// Add ValueLabels if necesary
-				if (variable.ValueLabels != null && variable.ValueLabels.Any())
-				{
-					var valueLabel = new ValueLabel(variable.ValueLabels.ToDictionary(p => BitConverter.GetBytes(p.Key), p => p.Value));
-					valueLabel.VariableIndex.Add(dictionaryIndex);
-					valueLabels.Add(valueLabel);
-				}
-			}
-		}
+                // TODO Avoid repeating the same valueLabels on the file
+                // Add ValueLabels if necessary
+                if (variable.ValueLabels == null || !variable.ValueLabels.Any()) continue;
+                var valueLabel = new ValueLabel(variable.ValueLabels.ToDictionary(p => BitConverter.GetBytes(p.Key), p => p.Value));
+                valueLabel.VariableIndex.Add(dictionaryIndex);
+                valueLabels.Add(valueLabel);
+            }
+        }
 
-	    private class ByteArrayComparer : IComparer<byte[]>
-	    {
-	        public int Compare(byte[] x, byte[] y)
-	        {
-	            var val = x[0] - y[0];
-                for (int i = 0; val == 0 && ++i < x.Length; val = x[i] - y[i]);
-	            return val;
-	        }
-	    }
+        private class ByteArrayComparer : IComparer<byte[]>
+        {
+            public int Compare(byte[]? x, byte[]? y)
+            {
+                var val = x![0] - y![0];
+                for (var i = 0; val == 0 && ++i < x.Length; val = x[i] - y[i])
+                {
+                }
 
-	    public void Dispose()
-		{
-			_writer.Flush();
-			_writer.Close();
-			_output.Dispose();
-		}
+                return val;
+            }
+        }
 
-		public void WriteRecord(object[] record)
-		{
-			if (_recordWriter == null)
-			{
-				throw new SpssFileFormatException("Record writer not set");
-			}
 
-			for (int i = 0; i < _variables.Length; i++)
-			{
-				var variable = _variables[i];
-				if (variable.Type == DataType.Numeric)
-				{
-					if (record[i] == null)
-					{
-						_recordWriter.WriteSysMiss();
-					}
-					else
-					{
-						_recordWriter.WriteNumber((double)record[i]);
-					}
-				}
-				else
-				{
-                    if (_stringWriter == null)
-                    {
-                        throw new SpssFileFormatException("String writer not set");
-                    }
-					_stringWriter.WriteString((string)record[i], variable.TextWidth);
-				}
-			}
-		}
+        public void WriteRecord(object?[] record)
+        {
+            if (_recordWriter == null) throw new SpssFileFormatException("Record writer not set");
 
-		public void EndFile()
-		{
-			_recordWriter.EndFile();
-		}
-	}
+            for (var i = 0; i < _variables!.Length; i++)
+            {
+                var variable = _variables[i];
+                if (variable.Type == DataType.Numeric)
+                {
+                    if (record[i] == null)
+                        _recordWriter.WriteSysMiss();
+                    else
+                        _recordWriter.WriteNumber((double)record[i]!);
+                }
+                else
+                {
+                    if (_stringWriter == null) throw new SpssFileFormatException("String writer not set");
+                    _stringWriter.WriteString((string)record[i]!, variable.TextWidth);
+                }
+            }
+        }
 
-    class ValueLabel
-	{
-        public IDictionary<byte[], string> Labels { get; private set; }
+        public void EndFile()
+        {
+            _recordWriter!.EndFile();
+        }
+    }
 
-		public IList<int> VariableIndex { get; } = new List<int>();
-
+    internal class ValueLabel
+    {
         public ValueLabel(IDictionary<byte[], string> labels)
-		{
-			Labels = labels;
-		}
-	}
+        {
+            Labels = labels;
+        }
+
+        public IDictionary<byte[], string> Labels { get; }
+
+        public IList<int> VariableIndex { get; } = new List<int>();
+    }
 }

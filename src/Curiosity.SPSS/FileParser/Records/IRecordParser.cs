@@ -11,23 +11,20 @@ namespace Curiosity.SPSS.FileParser.Records
 
     internal class GeneralRecordParser<TRecord> : IRecordParser where TRecord : IRecord
     {
-        public RecordType Accepts { get; }
-
         public GeneralRecordParser(RecordType accepts)
         {
             Accepts = accepts;
         }
 
+        public RecordType Accepts { get; }
+
         public IRecord ParseRecord(BinaryReader reader)
         {
-            TRecord record = CreateRecord();
+            var record = CreateRecord();
             record.FillRecord(reader);
             return record;
         }
 
-        private TRecord CreateRecord()
-        {
-            return (TRecord)FormatterServices.GetUninitializedObject(typeof(TRecord));
-        }
+        private static TRecord CreateRecord() => (TRecord) FormatterServices.GetUninitializedObject(typeof(TRecord));
     }
 }

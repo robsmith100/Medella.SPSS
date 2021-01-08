@@ -1,23 +1,22 @@
-﻿
-namespace Curiosity.SPSS.SpssDataset
+﻿namespace Curiosity.SPSS.SpssDataset
 {
     /// <summary>
-    /// The alignment of the variable for display purposes
+    ///     The alignment of the variable for display purposes
     /// </summary>
     public enum Alignment
     {
         /// <summary>
-        /// Left aligned
+        ///     Left aligned
         /// </summary>
         Left = 0,
-        
+
         /// <summary>
-        /// Right aligned
+        ///     Right aligned
         /// </summary>
         Right = 1,
-        
+
         /// <summary>
-        /// Center aligned
+        ///     Center aligned
         /// </summary>
         Centre = 2
     }

@@ -6,33 +6,33 @@ namespace Curiosity.SPSS.FileParser
 {
     internal class StringWriter
     {
-        private readonly IRecordWriter _recordWriter;
-
         /// <summary>
-        /// Encoder to get the bytes of string data
-        /// </summary>
-        private readonly Encoder _encoder;
-
-        /// <summary>
-        /// Buffer to hold encoded string bytes
-        /// </summary>
-        private readonly byte[] _stringBytesBuffer;
-
-        /// <summary>
-        /// Size in chars for the encoded bytes
+        ///     Size in chars for the encoded bytes
         /// </summary>
         private const int CharsBufferSize = 1024;
 
         /// <summary>
-        /// Buffer to hold up to 255 encoded bytes + 1 space char byte (the bytes for the string segment)
-        /// This wil be used to direclty write into the uncompressed buffer
-        /// </summary>
-        private readonly byte[] _stringSegmentBuffer;
-
-        /// <summary>
-        /// The max useful byte capacity for a segment
+        ///     The max useful byte capacity for a segment
         /// </summary>
         private const int StringSegmentByteSize = 255;
+
+        /// <summary>
+        ///     Encoder to get the bytes of string data
+        /// </summary>
+        private readonly Encoder _encoder;
+
+        private readonly IRecordWriter _recordWriter;
+
+        /// <summary>
+        ///     Buffer to hold encoded string bytes
+        /// </summary>
+        private readonly byte[] _stringBytesBuffer;
+
+        /// <summary>
+        ///     Buffer to hold up to 255 encoded bytes + 1 space char byte (the bytes for the string segment)
+        ///     This wil be used to directly write into the uncompressed buffer
+        /// </summary>
+        private readonly byte[] _stringSegmentBuffer;
 
         public StringWriter(Encoding encoding, IRecordWriter recordWriter)
         {
@@ -45,7 +45,7 @@ namespace Curiosity.SPSS.FileParser
             _stringSegmentBuffer[255] = 0x20;
         }
 
-        public void WriteString(string s, int width)
+        public void WriteString(string? s, int width)
         {
             _recordWriter.StartString();
 
@@ -56,17 +56,15 @@ namespace Curiosity.SPSS.FileParser
             var length = VariableRecord.GetLongStringBytesCount(width);
 
             var charIndex = 0;
-            int writtenBytes = 0;
+            var writtenBytes = 0;
             var writtenUpToIndex = 0;
 
             while (chars.Length > charIndex && writtenBytes < length)
             {
                 var charsToRead = Math.Min(chars.Length - charIndex, CharsBufferSize);
 
-                int charsRead, bytesRead;
-                bool completed;
                 _encoder.Convert(chars, charIndex, charsToRead, _stringBytesBuffer, 0, _stringBytesBuffer.Length,
-                                 false, out charsRead, out bytesRead, out completed);
+                    false, out var charsRead, out var bytesRead, out _);
 
                 // Move index forward for next read
                 charIndex += charsRead;
@@ -77,7 +75,7 @@ namespace Curiosity.SPSS.FileParser
 
             // Clean encoder internal buffer
             _encoder.Reset();
-            
+
             _recordWriter.EndStringVariable(writtenBytes, length);
         }
 
@@ -90,34 +88,30 @@ namespace Curiosity.SPSS.FileParser
                 var lengthToCopy = Math.Min(bytesLeftToWrite, StringSegmentByteSize - writtenUpToIndex);
 
                 Buffer.BlockCopy(_stringBytesBuffer, copiedToBufferIndex, _stringSegmentBuffer, writtenUpToIndex,
-                           lengthToCopy);
+                    lengthToCopy);
 
                 copiedToBufferIndex += lengthToCopy;
 
                 var writeUpToIndex = writtenUpToIndex + lengthToCopy;
                 // Include the space at position 256 of the VLS segment, if we've reached the end of the segment buffer
-                if (writeUpToIndex == StringSegmentByteSize)
-                {
-                    writeUpToIndex = StringSegmentByteSize + 1;
-                }
+                if (writeUpToIndex == StringSegmentByteSize) writeUpToIndex = StringSegmentByteSize + 1;
 
                 while (writtenUpToIndex < writeUpToIndex && writtenBytes < length)
                 {
                     // Write wither a full block or less, not more
-                    var writeBytes = Math.Min(writeUpToIndex - writtenUpToIndex, Constants.BLOCK_BYTE_SIZE);
+                    var writeBytes = Math.Min(writeUpToIndex - writtenUpToIndex, Constants.BlockByteSize);
                     _recordWriter.WriteCharBytes(_stringSegmentBuffer, writtenUpToIndex, writeBytes);
                     writtenUpToIndex += writeBytes;
                     writtenBytes += writeBytes;
                 }
-                // Decrement the ammount of bytes left to write
+
+                // Decrement the amount of bytes left to write
                 bytesLeftToWrite -= lengthToCopy;
 
                 // If we've reached the end of the segment buffer, reset the position
-                if (writtenUpToIndex == StringSegmentByteSize + 1)
-                {
-                    writtenUpToIndex = 0;
-                }
+                if (writtenUpToIndex == StringSegmentByteSize + 1) writtenUpToIndex = 0;
             }
+
             return writtenBytes;
         }
     }

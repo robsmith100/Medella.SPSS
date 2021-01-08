@@ -5,7 +5,7 @@ namespace Curiosity.SPSS.FileParser.Records
 {
     internal class EbcdicHeaderRecord : IRecord
     {
-        public NotSupportedException Exception => new NotSupportedException("EBCDIC???? Who uses that? Honestly!!");
+        public static NotSupportedException Exception => new("EBCDIC???? Who uses that? Honestly!!");
 
         public RecordType RecordType => RecordType.EbcdicHeaderRecord;
 

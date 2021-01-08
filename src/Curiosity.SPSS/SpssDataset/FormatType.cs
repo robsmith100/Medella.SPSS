@@ -1,9 +1,9 @@
-﻿
-namespace Curiosity.SPSS.SpssDataset
+﻿namespace Curiosity.SPSS.SpssDataset
 {
     /// <summary>
-    /// The print/write format for the data.
-    /// For more info on this see http://www.ibm.com/support/knowledgecenter/SSLVMB_20.0.0/com.ibm.spss.statistics.help/syn_variables_variable_formats.htm
+    ///     The print/write format for the data.
+    ///     For more info on this see
+    ///     http://www.ibm.com/support/knowledgecenter/SSLVMB_20.0.0/com.ibm.spss.statistics.help/syn_variables_variable_formats.htm
     /// </summary>
     public enum FormatType
     {
@@ -24,7 +24,7 @@ namespace Curiosity.SPSS.SpssDataset
         NotUsed3 = 14,
         Z = 15,
         N = 16,
-        E = 17,        
+        E = 17,
         NotUsed4 = 18,
         NotUsed5 = 19,
         DATE = 20,
