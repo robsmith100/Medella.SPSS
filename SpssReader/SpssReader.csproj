@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>Spss</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SpssCommon\SpssCommon.csproj" />
+    </ItemGroup>
+
+</Project>
