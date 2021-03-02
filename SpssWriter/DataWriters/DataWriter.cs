@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Spss.Extensions;
+using Spss.Encodings;
 using SpssCommon;
-using SpssCommon.Models;
-using SpssCommon.VariableModel;
+using SpssCommon.FileStructure;
+using SpssCommon.SpssMetadata;
 
 namespace Spss.DataWriters
 {
@@ -17,6 +17,7 @@ namespace Spss.DataWriters
         // 1 to 251 are the compressed values
         private readonly int _bias;
         private readonly List<object?> _data;
+        private readonly Encoding _encoding;
         private readonly int _rows;
         private readonly List<Variable> _variables;
         private readonly BlockWriter _writer;
@@ -30,6 +31,7 @@ namespace Spss.DataWriters
             _bias = spssData.Metadata.Bias;
             _rows = spssData.Metadata.Cases;
             _data = spssData.Data;
+            _encoding = Encoding.GetEncoding(spssData.Metadata.DataCodePage, new RemoveReplacementCharEncoderFallback(), DecoderFallback.ReplacementFallback);
         }
 
         public void Write()
@@ -41,9 +43,9 @@ namespace Spss.DataWriters
                 var variable = variables[i % rowLength];
                 var formatType = variable.FormatType;
                 var o = _data[i];
-                if (formatType == FormatType.A) WriteString((string) (o ?? string.Empty),variable.SpssWidth);
+                if (formatType == FormatType.A) WriteString((string) (o ?? string.Empty), variable.SpssWidth);
                 else if (formatType.IsDate()) _Write((DateTime?) o);
-                else  _Write((double?) o);
+                else _Write((double?) o);
             }
         }
 
@@ -125,8 +127,8 @@ namespace Spss.DataWriters
         private void WriteString(string value, int valueLength)
         {
             var rawVariableLength = SpssMath.GetAllocatedSize(valueLength);
-            var (charLength, byteLength) = Encoding.UTF8.GetStringLength(value.TrimEnd(), valueLength);
-            var bytes = Encoding.UTF8.GetBytes(value[..charLength]);
+            var bytes = _encoding.GetBytes(value.TrimEnd(), valueLength);
+            var byteLength = bytes.Length;
             WriteStringBytes(bytes);
             _writer.AddPadding();
             var writtenBytes = byteLength / 255 * 256 + (byteLength + 7) % 255 / 8 * 8;

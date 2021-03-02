@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using SpssCommon.Models;
+using SpssCommon.FileStructure;
 
 namespace Spss.DataWriters
 {

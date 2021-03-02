@@ -4,9 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using SpssCommon;
-using SpssCommon.Models;
-using SpssCommon.VariableModel;
+using SpssCommon.FileStructure;
+using SpssCommon.SpssMetadata;
 
 namespace Spss.DataReaders
 {
@@ -100,7 +99,7 @@ namespace Spss.DataReaders
                 else if (code == CompressedCode.SpaceCharsBlock) _uncompressedBuffer[position++] = _spacesBytes;
                 else if (code == CompressedCode.SysMiss) _uncompressedBuffer[position++] = _sysMiss;
                 else if (code == CompressedCode.EndOfFile) break;
-                else _uncompressedBuffer[position++] = BitConverter.GetBytes((double)(code - _metadata.Bias));
+                else _uncompressedBuffer[position++] = BitConverter.GetBytes((double) (code - _metadata.Bias));
 
             foreach (var i in todo)
                 _uncompressedBuffer[i] = _reader.ReadBytes(8);

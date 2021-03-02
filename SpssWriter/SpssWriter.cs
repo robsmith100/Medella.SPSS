@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Spss.DataWriters;
-using Spss.VariableWriters;
+using Spss.MetadataWriters;
 using SpssCommon;
-using SpssCommon.VariableModel;
+using SpssCommon.SpssMetadata;
 
 namespace Spss
 {
@@ -14,7 +14,7 @@ namespace Spss
     {
         private readonly BinaryWriter _writer;
         public readonly DataWriter DataWriter;
-        public readonly VariableWriter VariableWriter;
+        public readonly MetadataWriter MetadataWriter;
 
 
         public SpssWriter(List<Variable> variables, Stream stream) : this(new Metadata(variables), stream)
@@ -27,8 +27,8 @@ namespace Spss
 
         public SpssWriter(SpssData spssData, Stream stream)
         {
-            _writer = new BinaryWriter(stream,Encoding.ASCII,true);
-            VariableWriter = new VariableWriter(_writer, spssData.Metadata);
+            _writer = new BinaryWriter(stream, Encoding.ASCII, true);
+            MetadataWriter = new MetadataWriter(_writer, spssData.Metadata);
             DataWriter = new DataWriter(_writer, spssData);
         }
 
@@ -51,7 +51,7 @@ namespace Spss
         public static void Write(SpssData spssData, Stream stream)
         {
             var writer = new SpssWriter(spssData, stream);
-            writer.VariableWriter.Write();
+            writer.MetadataWriter.Write();
             writer.DataWriter.Write();
             ((IDisposable) writer).Dispose();
         }

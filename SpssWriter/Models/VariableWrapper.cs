@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using SpssCommon.Models;
-using SpssCommon.VariableModel;
+using SpssCommon.FileStructure;
+using SpssCommon.SpssMetadata;
 
 namespace Spss.Models
 {
@@ -15,6 +15,7 @@ namespace Spss.Models
         }
 
         public OutputFormat OutputFormat { get; }
+
         public string Name
         {
             get => _variable.Name;
@@ -25,6 +26,7 @@ namespace Spss.Models
         public MeasurementType Measure => _variable.MeasurementType;
         public int Columns => _variable.Columns;
         public Alignment Alignment => _variable.Alignment;
+
         public string? Label
         {
             get => _variable.Label;
@@ -33,6 +35,7 @@ namespace Spss.Models
 
         public MissingValueType MissingValueType => _variable.MissingValueType;
         public object[] MissingValuesObject => _variable.MissingValues;
+
         internal int ValueLength
         {
             get => _variable.SpssWidth;
