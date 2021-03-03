@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Spss.Encodings;
+using Spss.FileStructure;
 using SpssCommon;
-using SpssCommon.FileStructure;
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 
 namespace Spss.DataWriters
 {

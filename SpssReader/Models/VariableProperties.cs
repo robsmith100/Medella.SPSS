@@ -1,5 +1,5 @@
 using System;
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 
 namespace Spss.Models
 {

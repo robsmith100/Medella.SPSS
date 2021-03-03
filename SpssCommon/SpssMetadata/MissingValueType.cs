@@ -1,4 +1,4 @@
-namespace SpssCommon.SpssMetadata
+namespace Spss.SpssMetadata
 {
     /// <summary>
     ///     The kind of custom missing values for a variable

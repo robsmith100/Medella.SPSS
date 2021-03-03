@@ -5,8 +5,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Spss.Encodings;
 using Spss.Models;
-using SpssCommon.FileStructure;
-using SpssCommon.SpssMetadata;
+using Spss.FileStructure;
+using Spss.SpssMetadata;
 
 namespace Spss.MetadataReaders.RecordReaders
 {

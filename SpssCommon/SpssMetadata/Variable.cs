@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SpssCommon.FileStructure;
+using Spss.FileStructure;
 
-namespace SpssCommon.SpssMetadata
+namespace Spss.SpssMetadata
 {
     public abstract class Variable
     {

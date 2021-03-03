@@ -1,4 +1,4 @@
-﻿namespace SpssCommon.SpssMetadata
+﻿namespace Spss.SpssMetadata
 {
     /// <summary>
     ///     The measurement type of the variable

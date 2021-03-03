@@ -1,6 +1,6 @@
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 
-namespace SpssCommon.FileStructure
+namespace Spss.FileStructure
 {
     public class DisplayParameter
     {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Spss.Models;
-using SpssCommon.FileStructure;
-using SpssCommon.SpssMetadata;
+using Spss.FileStructure;
+using Spss.SpssMetadata;
 
 namespace Spss.MetadataWriters.Generators
 {

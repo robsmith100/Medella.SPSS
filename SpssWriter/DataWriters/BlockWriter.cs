@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using SpssCommon.FileStructure;
+using Spss.FileStructure;
 
 namespace Spss.DataWriters
 {

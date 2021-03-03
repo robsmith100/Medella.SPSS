@@ -1,4 +1,4 @@
-﻿namespace SpssCommon.SpssMetadata
+﻿namespace Spss.SpssMetadata
 {
     /// <summary>
     ///     The alignment of the variable for display purposes

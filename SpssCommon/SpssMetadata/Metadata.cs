@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SpssCommon.SpssMetadata
+namespace Spss.SpssMetadata
 {
     public class Metadata
     {

@@ -1,7 +1,7 @@
 using System;
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 
-namespace SpssCommon.FileStructure
+namespace Spss.FileStructure
 {
     public readonly struct OutputFormat
     {

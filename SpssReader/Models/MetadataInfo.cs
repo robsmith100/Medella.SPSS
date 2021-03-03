@@ -1,6 +1,6 @@
 using System.Collections.Generic;
-using SpssCommon.FileStructure;
-using SpssCommon.SpssMetadata;
+using Spss.FileStructure;
+using Spss.SpssMetadata;
 
 namespace Spss.Models
 {

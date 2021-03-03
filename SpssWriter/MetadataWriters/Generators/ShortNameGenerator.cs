@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Spss.Encodings;
 using Spss.Models;
-using SpssCommon.FileStructure;
+using Spss.FileStructure;
 // ReSharper disable StringLiteralTypo
 
 namespace Spss.MetadataWriters.Generators

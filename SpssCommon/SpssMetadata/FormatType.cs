@@ -1,6 +1,6 @@
 using System.Linq;
 
-namespace SpssCommon.SpssMetadata
+namespace Spss.SpssMetadata
 {
     /// <summary>
     ///     The print/write format for the data.

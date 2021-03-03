@@ -3,8 +3,8 @@ using System.IO;
 using Spss.MetadataReaders.Convertors;
 using Spss.MetadataReaders.RecordReaders;
 using Spss.Models;
-using SpssCommon.FileStructure;
-using SpssCommon.SpssMetadata;
+using Spss.FileStructure;
+using Spss.SpssMetadata;
 
 namespace Spss.MetadataReaders
 {

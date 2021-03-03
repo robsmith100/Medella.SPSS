@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 
 namespace SpssCommon
 {

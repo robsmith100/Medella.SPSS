@@ -1,6 +1,6 @@
 using System;
 
-namespace SpssCommon.FileStructure
+namespace Spss.FileStructure
 {
     public static class SpssMath
     {

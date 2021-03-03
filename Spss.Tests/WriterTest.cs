@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using Spss;
 using SpssCommon;
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 using Xunit;
 
 // ReSharper disable StringLiteralTypo

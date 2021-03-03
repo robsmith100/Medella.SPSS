@@ -4,7 +4,7 @@ using System.IO;
 using Spss.DataReaders;
 using Spss.MetadataReaders;
 using SpssCommon;
-using SpssCommon.SpssMetadata;
+using Spss.SpssMetadata;
 
 namespace Spss
 {

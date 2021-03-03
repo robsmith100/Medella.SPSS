@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SpssCommon.FileStructure
+namespace Spss.FileStructure
 {
     public class MachineIntegerInfo
     {

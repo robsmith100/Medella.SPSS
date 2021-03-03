@@ -1,4 +1,4 @@
-﻿namespace SpssCommon.FileStructure
+﻿namespace Spss.FileStructure
 {
     public enum RecordType
     {

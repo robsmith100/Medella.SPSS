@@ -5,8 +5,8 @@ using System.Linq;
 using System.Text;
 using Spss.Encodings;
 using Spss.Models;
-using SpssCommon.FileStructure;
-using SpssCommon.SpssMetadata;
+using Spss.FileStructure;
+using Spss.SpssMetadata;
 
 namespace Spss.MetadataWriters.RecordWriters
 {

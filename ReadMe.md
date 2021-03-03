@@ -60,14 +60,6 @@ The libriary is refactored to a cleancode library
                 ["b"] = "valueLabel for b"
             }
         }.MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
-        new Variable<string>("var1", 9)
-        {
-            Label = "label for var1", ValueLabels = new Dictionary<string, string>
-            {
-                ["a"] = "valueLabel for a",
-                ["b"] = "valueLabel for b"
-            }
-        },
         new Variable<double>("var2", 7, 3)
         {
             Label = "label for var2",
