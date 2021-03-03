@@ -53,9 +53,6 @@ namespace SpssCommon.SpssMetadata
 
     public static class SpssExtensions
     {
-        public static bool IsNumber(this FormatType format) =>
-            new[] { FormatType.N, FormatType.F, FormatType.COMMA, FormatType.DOT, FormatType.E, FormatType.DOLLAR, FormatType.CCA, FormatType.CCB, FormatType.CCC, FormatType.CCD, FormatType.CCE }.Contains(format);
-
         public static bool IsDate(this FormatType format) =>
             format == FormatType.ADATE
             || format == FormatType.DATE

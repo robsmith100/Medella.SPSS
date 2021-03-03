@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Spss.Models;
 using SpssCommon.FileStructure;
-using SpssCommon.Models;
 
 namespace Spss.MetadataWriters.Generators
 {
@@ -15,7 +14,7 @@ namespace Spss.MetadataWriters.Generators
             {
                 var displayValue = new DisplayParameter { Measure = variable.Measure, Columns = variable.Columns, Alignment = variable.Alignment };
                 var namedVariables = SpssMath.GetNumberOfGhostVariables(variable.ValueLength) + 1;
-                displayValues.AddRange(Enumerable.Range(1, namedVariables).Select(x => displayValue));
+                displayValues.AddRange(Enumerable.Range(1, namedVariables).Select(_ => displayValue));
             }
 
             return displayValues;

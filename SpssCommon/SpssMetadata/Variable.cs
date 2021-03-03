@@ -62,11 +62,6 @@ namespace SpssCommon.SpssMetadata
         /// </summary>
         public MeasurementType MeasurementType { get; set; } = MeasurementType.Nominal;
 
-        public static Variable Create(string name, FormatType formatType) => Create(name, formatType, 8, 2);
-        public static Variable Create(string name, FormatType formatType, int spssWidth) => Create(name, formatType, spssWidth, 2);
-
-        public static Variable Create(string name, FormatType formatType, int spssWidth, int decimalPlaces) => Create(name, null, formatType, spssWidth, decimalPlaces);
-
         public static Variable Create(string name, string? label, FormatType formatType, int spssWidth, int decimalPlaces)
         {
             if (formatType == FormatType.A) return new Variable<string>(name, spssWidth, decimalPlaces) { Label = label };
@@ -98,21 +93,19 @@ namespace SpssCommon.SpssMetadata
         }
 
 
-        public Variable<T> MissingValues(T[] missingValues)
+        public new Variable<T> MissingValues(T[] missingValues)
         {
             var length = missingValues.Length;
             if (length > 3) length = 3;
             return MissingValues((MissingValueType) length, missingValues[..length]);
         }
 
-        public Variable<T> MissingValues(MissingValueType missingValueType, T[] missingValues)
+        public new Variable<T> MissingValues(MissingValueType missingValueType, T[] missingValues)
         {
             if (Math.Abs((int) missingValueType) != missingValues.Length) throw new InvalidOperationException($"Expected number of missing {Math.Abs((int) missingValueType)}!={missingValues.Length}");
             MissingValueType = missingValueType;
             if (typeof(DateTime) == typeof(T) || typeof(DateTime?) == typeof(T))
                 base.MissingValues = missingValues.Cast<DateTime>().Select(x => (object) x.SpssDate()).ToArray();
-            else if (typeof(int) == typeof(T) || typeof(int?) == typeof(T))
-                base.MissingValues = missingValues.Select(x => (object) Convert.ToDouble(x)).ToArray();
             else
                 base.MissingValues = missingValues.Cast<object>().ToArray();
             return this;

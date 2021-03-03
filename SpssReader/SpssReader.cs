@@ -33,6 +33,7 @@ namespace Spss
             var reader = new SpssReader(stream);
             var metadata = reader._metadataReader.Read();
             var data = reader._dataReader.Read();
+            reader.Dispose();
             return new SpssData { Metadata = metadata, Data = data };
         }
     }

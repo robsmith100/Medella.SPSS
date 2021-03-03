@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using Spss.Encodings;
 using Spss.Models;
 using SpssCommon.FileStructure;
-using SpssCommon.Models;
 using SpssCommon.SpssMetadata;
 
 namespace Spss.MetadataReaders.RecordReaders
@@ -48,7 +47,7 @@ namespace Spss.MetadataReaders.RecordReaders
             var variable = _reader.ReadBytes(_reader.ReadInt32());
             var missingCount = _reader.ReadByte();
             var missingLength = _reader.ReadInt32();
-            var missingValues = Enumerable.Range(0, missingCount).Select(x => _reader.ReadBytes(missingLength)).ToList();
+            var missingValues = Enumerable.Range(0, missingCount).Select(_ => _reader.ReadBytes(missingLength)).ToList();
             _metadataInfo.LongStringMissing.Add(new LongStringMissing(variable, missingValues));
         }
 
@@ -59,7 +58,7 @@ namespace Spss.MetadataReaders.RecordReaders
             var variable = _reader.ReadBytes(_reader.ReadInt32());
             _reader.ReadInt32(); //length
             var labelCount = _reader.ReadInt32();
-            var labels = Enumerable.Range(0, labelCount).Select(x =>
+            var labels = Enumerable.Range(0, labelCount).Select(_ =>
             {
                 var valueLength = _reader.ReadInt32();
                 var value = _reader.ReadBytes(valueLength);

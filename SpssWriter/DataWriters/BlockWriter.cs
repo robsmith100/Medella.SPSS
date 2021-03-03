@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using SpssCommon.FileStructure;
 
@@ -71,8 +72,7 @@ namespace Spss.DataWriters
             WriteCompleteBlocks(currentFullBlockIndex);
 
             _uncompressedIndex -= currentFullBlockIndex;
-            if (_uncompressedIndex > 0)
-                MoveRemainder(currentFullBlockIndex);
+            Debug.Assert(_uncompressedIndex==0, "_uncompressedIndex should be 0");
         }
 
         public void Flush()
@@ -83,7 +83,6 @@ namespace Spss.DataWriters
             _writer.Flush();
         }
 
-        private void MoveRemainder(int currentFullBlockIndex) => Buffer.BlockCopy(_uncompressedBuffer, currentFullBlockIndex, _uncompressedBuffer, 0, _uncompressedIndex);
 
         private void WriteCompleteBlocks(int currentFullBlockIndex) => _writer.Write(_uncompressedBuffer, 0, currentFullBlockIndex);
     }

@@ -98,22 +98,7 @@ namespace Spss.DataWriters
             _writer.WriteCompressedCode(code);
         }
 
-        public void Write(int? value)
-        {
-            if (_variables[_variableIndex].FormatType == FormatType.A) throw new InvalidOperationException($"Can't write int to a string variable {_variables[_variableIndex].Name} ");
-            _Write(value);
-            UpdateVariableIndex();
-        }
-
-        private void _Write(int? value)
-        {
-            var code = GetUncompressedCode(value);
-            if (code == CompressedCode.Uncompressed)
-                _writer.WriteToUncompressedBuffer(BitConverter.GetBytes((double) value!));
-            _writer.WriteCompressedCode(code);
-        }
-
-        public void CloseFile() => _writer.Flush();
+        public void Flush() => _writer.Flush();
 
         private void UpdateVariableIndex()
         {
@@ -121,7 +106,7 @@ namespace Spss.DataWriters
             if (_variables.Count != _variableIndex) return;
             _variableIndex = 0;
             RowIndex++;
-            if (_rows == RowIndex) CloseFile();
+            if (_rows == RowIndex) Flush();
         }
 
         private void WriteString(string value, int valueLength)
@@ -163,13 +148,6 @@ namespace Spss.DataWriters
             value is null
                 ? CompressedCode.SysMiss
                 : Math.Abs(value.Value % 1) < 0.00001 && value + _bias is > CompressedCode.Padding and < CompressedCode.EndOfFile
-                    ? (byte) (value + _bias)
-                    : CompressedCode.Uncompressed;
-
-        private byte GetUncompressedCode(int? value) =>
-            value is null
-                ? CompressedCode.SysMiss
-                : value + _bias is > CompressedCode.Padding and < CompressedCode.EndOfFile
                     ? (byte) (value + _bias)
                     : CompressedCode.Uncompressed;
     }

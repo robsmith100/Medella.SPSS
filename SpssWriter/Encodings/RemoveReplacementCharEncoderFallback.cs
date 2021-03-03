@@ -4,7 +4,7 @@ namespace Spss.Encodings
 {
     public class RemoveReplacementCharEncoderFallback : EncoderFallback
     {
-        public override int MaxCharCount => 0;
+        public override int MaxCharCount => 0; 
 
         public override EncoderFallbackBuffer CreateFallbackBuffer() => new RemoveReplacementCharEncoderFallbackBuffer();
 

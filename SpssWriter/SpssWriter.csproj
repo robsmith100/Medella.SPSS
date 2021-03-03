@@ -4,19 +4,9 @@
         <Nullable>enable</Nullable>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Spss</RootNamespace>
+		<PackageProjectUrl>https://github.com/Anderman/Medella.SPSS</PackageProjectUrl>
+	    <RepositoryUrl>https://github.com/Anderman/Medella.SPSS</RepositoryUrl>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Compile Remove="SpssWriter\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Remove="SpssWriter\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="SpssWriter\**" />
-    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\SpssCommon\SpssCommon.csproj" />

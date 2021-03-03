@@ -53,7 +53,7 @@ namespace Spss.MetadataReaders.RecordReaders
 
             _reader.ReadInt32();
             count = _reader.ReadInt32();
-            var indexes = Enumerable.Range(0, count).Select(x => _reader.ReadInt32()).ToList();
+            var indexes = Enumerable.Range(0, count).Select(_ => _reader.ReadInt32()).ToList();
             _metadataInfo.ShortValueLabels.Add(new ShortValueLabel(labels, indexes));
         }
 
@@ -85,7 +85,7 @@ namespace Spss.MetadataReaders.RecordReaders
 
         private void ReadMissing(VariableProperties properties)
         {
-            properties.Missing = Enumerable.Range(0, Math.Abs(properties.MissingValueType)).Select(x => _reader.ReadBytes(8)).ToArray();
+            properties.Missing = Enumerable.Range(0, Math.Abs(properties.MissingValueType)).Select(_ => _reader.ReadBytes(8)).ToArray();
         }
 
         private byte[] ReadLabel()

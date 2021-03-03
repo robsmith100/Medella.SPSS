@@ -6,7 +6,6 @@ using System.Text;
 using Spss.Encodings;
 using Spss.Models;
 using SpssCommon.FileStructure;
-using SpssCommon.Models;
 using SpssCommon.SpssMetadata;
 
 namespace Spss.MetadataWriters.RecordWriters

@@ -34,7 +34,7 @@ namespace Spss
 
         void IDisposable.Dispose()
         {
-            DataWriter.CloseFile();
+            DataWriter.Flush();
             _writer.Flush();
         }
 

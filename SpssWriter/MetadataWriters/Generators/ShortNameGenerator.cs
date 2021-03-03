@@ -5,17 +5,19 @@ using System.Text;
 using Spss.Encodings;
 using Spss.Models;
 using SpssCommon.FileStructure;
+// ReSharper disable StringLiteralTypo
 
 namespace Spss.MetadataWriters.Generators
 {
     public class ShortNameGenerator
     {
-        private static readonly char[] SuffixChar = Enumerable.Range('A', 'Z').Select(i => (char) i).ToArray();
+        private const string SuffixChar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private readonly Encoding _encoding;
         private readonly HashSet<byte[]> _shortNames;
 
         public ShortNameGenerator(Encoding encoding)
         {
+            
             _encoding = encoding;
             _shortNames = new HashSet<byte[]>(new ByteArrayEqualityComparer());
         }

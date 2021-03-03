@@ -57,7 +57,7 @@ namespace Spss.DataReaders
         private string? ReadString(int length)
         {
             length = length / 252 * 256 + length % 252;
-            var result = Enumerable.Range(0, (length + 7) / 8).Select(x => GetBlock()).Where(x => x.Length == 8).ToArray();
+            var result = Enumerable.Range(0, (length + 7) / 8).Select(_ => GetBlock()).Where(x => x.Length == 8).ToArray();
             var combine = Combine(result);
             var str = _encoding.GetString(combine).TrimEnd();
             return str == string.Empty ? null : str;
@@ -94,7 +94,7 @@ namespace Spss.DataReaders
             var readBytes = _reader.ReadBytes(8);
             Debug.Assert(readBytes.Length == 8, "End of stream?");
             foreach (var code in readBytes)
-                if (code == CompressedCode.Padding) ;
+                if (code == CompressedCode.Padding) {}
                 else if (code == CompressedCode.Uncompressed) todo.Add(position++);
                 else if (code == CompressedCode.SpaceCharsBlock) _uncompressedBuffer[position++] = _spacesBytes;
                 else if (code == CompressedCode.SysMiss) _uncompressedBuffer[position++] = _sysMiss;

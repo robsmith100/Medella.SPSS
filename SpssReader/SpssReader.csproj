@@ -4,6 +4,8 @@
         <Nullable>enable</Nullable>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Spss</RootNamespace>
+		<PackageProjectUrl>https://github.com/Anderman/Medella.SPSS</PackageProjectUrl>
+	    <RepositoryUrl>https://github.com/Anderman/Medella.SPSS</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
