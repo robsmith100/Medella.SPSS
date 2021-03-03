@@ -1,128 +1,105 @@
 # C# SPSS SAV file reader and writer library
 
+| Branch | Build status |
+| ------ | ------------ |
 
-|Branch|Build status|
-|---|---|
-|master|[![Build Status](https://travis-ci.com/SIIS-Ltd/Curiosity.SPSS.svg?branch=master)](https://travis-ci.com/SIIS-Ltd/Curiosity.SPSS)|
-|develop|[![Build Status](https://travis-ci.com/SIIS-Ltd/Curiosity.SPSS.svg?branch=dev)](https://travis-ci.com/SIIS-Ltd/Curiosity.SPSS)|
+[![Build Status](https://medella.visualstudio.com/Spss/_apis/build/status/Anderman.Medella.SPSS?branchName=master)](https://medella.visualstudio.com/Spss/_build/latest?definitionId=12&branchName=master)
 
-
-![Nuget](https://img.shields.io/nuget/v/Curiosity.SPSS)
+![Nuget](https://img.shields.io/nuget/v/DataWriter.SPSS)
 
 This library enables to read and write SPSS data files (.sav) on .net from and to a Stream. The library is UTF-8 safe.
 
-It is available as a nuget package at https://www.nuget.org/packages/Curiosity.SPSS, and can be installed using the package manager or by issueing:
-```
-Install-Package Curiosity.SPSS
-``` 
-It's a fork of [SPSS-.NET-Reader](https://github.com/fbiagi/SPSS-.NET-Reader) by fbiagi (based on [spsslib-80132](http://spsslib.codeplex.com/) by elmarj). 
-Since forking we have added writing ability, solved many bugs, provided closer SPSS binary integration by following the [PSPP provided SPSS format](https://www.gnu.org/software/pspp/pspp-dev/html_node/System-File-Format.html#System-File-Format). 
+It is available as a nuget package at https://www.nuget.org/packages/SpssReader en https://www.nuget.org/packages/SpssWriter, and can be installed using the package manager or by issueing:
 
-This library has been tested in production on a few large deployments at @SIIS-Ltd.
+```
+Install-Package SpssReader
+Install-Package SpssWriter
+```
+
+It's a fork of [SPSS-.NET-Reader](https://github.com/fbiagi/SPSS-.NET-Reader) by fbiagi (based on [spsslib-80132](http://spsslib.codeplex.com/) by elmarj).
+Since forking there are a lot of bug fixing for utf8 support and added string valuesLabels and string missing support.
+
+The libriary is refactored to a cleancode library
 
 ### To read a data file:
 
 ```C#
-// Open file, can be read only and sequetial (for performance), or anything else
-using (FileStream fileStream = new FileStream("data.sav", FileMode.Open, FileAccess.Read, FileShare.Read, 2048*10, 
-                                              FileOptions.SequentialScan))
-{
-    // Create the reader, this will read the file header
-    SpssReader spssDataset = new SpssReader(fileStream);
-    
-    // Iterate through all the varaibles
-    foreach (var variable in spssDataset.Variables)
-    {
-        // Display name and label
-        Console.WriteLine("{0} - {1}", variable.Name, variable.Label);
-        // Display value-labels collection
-        foreach (KeyValuePair<double, string> label in variable.ValueLabels)
-        {
-            Console.WriteLine(" {0} - {1}", label.Key, label.Value);
-        }
-    }
-    
-    // Iterate through all data rows in the file
-    foreach (var record in spssDataset.Records)
-    {
-        foreach (var variable in spssDataset.Variables)
-        {
-            Console.Write(variable.Name);
-            Console.Write(':');
-            // Use the corresponding variable object to get the values.
-            Console.Write(record.GetValue(variable));
-            // This will get the missing values as null, text with out extra spaces,
-            // and date values as DateTime.
-            // For original values, use record[variable] or record[int]
-            Console.Write('\t');
-        }
-        Console.WriteLine("");
-    }
+            var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
+
+            var spssData = SpssReader.Read(fileStream);
+
+            var variables = spssData.Metadata.Variables;
+            foreach (var variable in variables)
+            {
+                Console.WriteLine($"{variable.Name}, {variable.Label}");
+                if (variable.ValueLabels != null)
+                    Console.WriteLine(string.Join(",", variable.ValueLabels.Select(x => $"{x.Key} - {x.Value} ")));
+                Console.WriteLine(string.Join(",", variable.MissingValues));
+            }
+
+            for (var i = 0; i < spssData.Data.Count; i++)
+            {
+                var obj = spssData.Data[i];
+                Console.WriteLine($"{variables[i % variables.Count].Name}={obj}");
+            }
 }
 ```
 
 ### To write a data file:
+
 ```C#
 // Create Variable list
-var variables = new List<Variable>
-{
-    new Variable
+    var variables = new List<Variable>
     {
-        Label = "The variable Label",
-        ValueLabels = new Dictionary<double, string>
-                {
-                    {1, "Label for 1"},
-                    {2, "Label for 2"},
-                },
-        Name = "avariablename_01",
-        PrintFormat = new OutputFormat(FormatType.F, 8, 2),
-        WriteFormat = new OutputFormat(FormatType.F, 8, 2),
-        Type = DataType.Numeric,
-        Width = 10,
-        MissingValueType = MissingValueType.NoMissingValues
-    },
-    new Variable
+        new Variable<string>("var0", 8)
+        {
+            Label = "label for var0",
+            ValueLabels = new Dictionary<string, string>
+            {
+                ["a"] = "valueLabel for a",
+                ["b"] = "valueLabel for b"
+            }
+        }.MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
+        new Variable<string>("var1", 9)
+        {
+            Label = "label for var1", ValueLabels = new Dictionary<string, string>
+            {
+                ["a"] = "valueLabel for a",
+                ["b"] = "valueLabel for b"
+            }
+        },
+        new Variable<double>("var2", 7, 3)
+        {
+            Label = "label for var2",
+            ValueLabels = new Dictionary<double, string>
+            {
+                [15.5] = "valueLabel for 15.5",
+                [16] = "valueLabel for 16"
+            }
+        }.MissingValues(new[] { 0d }),
+        new Variable<DateTime>("var4", 20)
+        {
+            Label = "label for var4",
+            ValueLabels = new Dictionary<DateTime, string>
+            {
+                [new DateTime(2020, 1, 2)] = "valueLabel for 2 jan 2020",
+                [new DateTime(2020, 1, 1)] = "valueLabel for 1 jan 2020"
+            }
+        }
+    };
+    // create data
+    var data = new List<object?>
     {
-        Label = "Another variable",
-        ValueLabels = new Dictionary<double, string>
-                    {
-                        {1, "this is 1"},
-                        {2, "this is 2"},
-                    },
-        Name = "avariablename_02",
-        PrintFormat = new OutputFormat(FormatType.F, 8, 2),
-        WriteFormat = new OutputFormat(FormatType.F, 8, 2),
-        Type = DataType.Numeric,
-        Width = 10,
-        MissingValueType = MissingValueType.OneDiscreteMissingValue
-    }
-};
-// Set the one special missing value
-variables[1].MissingValues[0] = 999;  
+        "string", 15.5, new DateTime(2020, 1, 1),
+        null, null, null
+    };
 
-// Default options
-var options = new SpssOptions();
-
-using (FileStream fileStream = new FileStream("data.sav", FileMode.Create, FileAccess.Write))
-{
-    using (var writer = new SpssWriter(fileStream, variables, options))
-    {
-        // Create and write records
-        var newRecord = writer.CreateRecord();
-        newRecord[0] = 15d;
-        newRecord[1] = 15.5d;
-        writer.WriteRecord(newRecord);
-        
-        newRecord = writer.CreateRecord();
-        newRecord[0] = null;
-        newRecord[1] = 200d;
-        writer.WriteRecord(newRecord);
-        writer.EndFile();
-    }
-}
+    //Write variable and data to a stream
+    var ms = new MemoryStream();
+    SpssWriter.Write(variables, data, ms);
 ```
 
-If you find any bugs or have issues, please open an issue on GitHub. 
+If you find any bugs or have issues, please open an issue on GitHub.
 
 ## SAV file format
 

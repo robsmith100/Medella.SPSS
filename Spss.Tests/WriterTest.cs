@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -105,7 +104,7 @@ namespace SPSS.Tests
             var variables = new List<Variable>
             {
                 new Variable<string>("var0", 8).MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "a" }),
-                new Variable<string>("var1", 9).MissingValues( new[] { "a" }),
+                new Variable<string>("var1", 9).MissingValues(new[] { "a" }),
                 new Variable<double>("var2", 7, 3).MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { 12.2 }),
                 new Variable<DateTime>("var4", 20).MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { new DateTime(2020, 1, 1) })
             };
@@ -167,6 +166,7 @@ namespace SPSS.Tests
             var result = JsonSerializer.Serialize(spssData).Replace("\"", "'");
             Assert.Equal(Custom1.Replace(Environment.NewLine, ""), result);
         }
+
         [Fact]
         public void CanWriteObjectInSequenceWithMetadata()
         {
@@ -195,6 +195,55 @@ namespace SPSS.Tests
             ms.Position = 0;
             var filename = $@"TestFiles/{fileName}";
             File.WriteAllBytes(filename, ms.ToArray());
+        }
+
+        private void SampleWriter()
+        {
+            var variables = new List<Variable>
+            {
+                new Variable<string>("var0", 8)
+                {
+                    Label = "label for var0",
+                    ValueLabels = new Dictionary<string, string>
+                    {
+                        ["a"] = "valueLabel for a",
+                        ["b"] = "valueLabel for b"
+                    }
+                }.MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
+                new Variable<string>("var1", 9)
+                {
+                    Label = "label for var1", ValueLabels = new Dictionary<string, string>
+                    {
+                        ["a"] = "valueLabel for a",
+                        ["b"] = "valueLabel for b"
+                    }
+                },
+                new Variable<double>("var2", 7, 3)
+                {
+                    Label = "label for var2",
+                    ValueLabels = new Dictionary<double, string>
+                    {
+                        [15.5] = "valueLabel for 15.5",
+                        [16] = "valueLabel for 16"
+                    }
+                }.MissingValues(new[] { 0d }),
+                new Variable<DateTime>("var4", 20)
+                {
+                    Label = "label for var4",
+                    ValueLabels = new Dictionary<DateTime, string>
+                    {
+                        [new DateTime(2020, 1, 2)] = "valueLabel for 2 jan 2020",
+                        [new DateTime(2020, 1, 1)] = "valueLabel for 1 jan 2020"
+                    }
+                }
+            };
+            var data = new List<object?>
+            {
+                "string", 15.5, new DateTime(2020, 1, 1),
+                null, null, null
+            };
+            var ms = new MemoryStream();
+            SpssWriter.Write(variables,data, ms);
         }
     }
 }

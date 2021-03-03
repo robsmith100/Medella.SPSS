@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using Spss;
 using Xunit;
@@ -58,7 +61,7 @@ null,null,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         public void ShouldReadTestSav()
         {
             // Assign
-            var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open, FileAccess.Read, FileShare.Read, 2048 * 10, FileOptions.SequentialScan);
+            var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
 
             // Act
             var spssData = SpssReader.Read(fileStream);
@@ -136,6 +139,28 @@ null,null,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             // Assert
             var result = JsonSerializer.Serialize(spssData).Replace("\"", "'");
             Assert.Equal(MaxStringSav.Replace(NewLine, ""), result);
+        }
+
+        private void SampleReader()
+        {
+            var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
+
+            var spssData = SpssReader.Read(fileStream);
+
+            var variables = spssData.Metadata.Variables;
+            foreach (var variable in variables)
+            {
+                Console.WriteLine($"{variable.Name}, {variable.Label}");
+                if (variable.ValueLabels != null)
+                    Console.WriteLine(string.Join(",", variable.ValueLabels.Select(x => $"{x.Key} - {x.Value} ")));
+                Console.WriteLine(string.Join(",", variable.MissingValues));
+            }
+
+            for (var i = 0; i < spssData.Data.Count; i++)
+            {
+                var obj = spssData.Data[i];
+                Console.WriteLine($"{variables[i % variables.Count].Name}={obj}");
+            }
         }
     }
 }
