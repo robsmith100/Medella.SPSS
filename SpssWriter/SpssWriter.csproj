@@ -6,7 +6,7 @@
         <RootNamespace>Spss</RootNamespace>
 		<PackageProjectUrl>https://github.com/Anderman/Medella.SPSS</PackageProjectUrl>
 	    <RepositoryUrl>https://github.com/Anderman/Medella.SPSS</RepositoryUrl>
-	    <Description>A cleancode library for reading and writing .sav files</Description>
+			<Description>A cleancode library for writing spss .sav files</Description>
     </PropertyGroup>
 
     <ItemGroup>
