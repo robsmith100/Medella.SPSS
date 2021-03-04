@@ -24,24 +24,24 @@ The libriary is refactored to a cleancode library
 ### To read a data file:
 
 ```C#
-            var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
+    var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
 
-            var spssData = SpssReader.Read(fileStream);
+    var spssData = SpssReader.Read(fileStream);
 
-            var variables = spssData.Metadata.Variables;
-            foreach (var variable in variables)
-            {
-                Console.WriteLine($"{variable.Name}, {variable.Label}");
-                if (variable.ValueLabels != null)
-                    Console.WriteLine(string.Join(",", variable.ValueLabels.Select(x => $"{x.Key} - {x.Value} ")));
-                Console.WriteLine(string.Join(",", variable.MissingValues));
-            }
+    var variables = spssData.Metadata.Variables;
+    foreach (var variable in variables)
+    {
+        Console.WriteLine($"{variable.Name}, {variable.Label}");
+        if (variable.ValueLabels != null)
+            Console.WriteLine(string.Join(",", variable.ValueLabels.Select(x => $"{x.Key} - {x.Value} ")));
+        Console.WriteLine(string.Join(",", variable.MissingValues));
+    }
 
-            for (var i = 0; i < spssData.Data.Count; i++)
-            {
-                var obj = spssData.Data[i];
-                Console.WriteLine($"{variables[i % variables.Count].Name}={obj}");
-            }
+    for (var i = 0; i < spssData.Data.Count; i++)
+    {
+        var obj = spssData.Data[i];
+        Console.WriteLine($"{variables[i % variables.Count].Name}={obj}");
+    }
 }
 ```
 
@@ -59,7 +59,7 @@ The libriary is refactored to a cleancode library
                 ["a"] = "valueLabel for a",
                 ["b"] = "valueLabel for b"
             }
-        }.MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
+        }.UserMissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
         new Variable<double>("var2", 7, 3)
         {
             Label = "label for var2",
@@ -68,7 +68,7 @@ The libriary is refactored to a cleancode library
                 [15.5] = "valueLabel for 15.5",
                 [16] = "valueLabel for 16"
             }
-        }.MissingValues(new[] { 0d }),
+        }.UserMissingValues(new[] { 0d }),
         new Variable<DateTime>("var4", 20)
         {
             Label = "label for var4",

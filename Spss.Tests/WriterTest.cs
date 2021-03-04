@@ -103,10 +103,10 @@ namespace SPSS.Tests
             // Assign
             var variables = new List<Variable>
             {
-                new Variable<string>("var0", 8).MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "a" }),
-                new Variable<string>("var1", 9).MissingValues(new[] { "a" }),
-                new Variable<double>("var2", 7, 3).MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { 12.2 }),
-                new Variable<DateTime>("var4", 20).MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { new DateTime(2020, 1, 1) })
+                new Variable<string>("var0", 8).UserMissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "a" }),
+                new Variable<string>("var1", 9).UserMissingValues(new[] { "a" }),
+                new Variable<double>("var2", 7, 3).UserMissingValues(MissingValueType.OneDiscreteMissingValue, new[] { 12.2 }),
+                new Variable<DateTime>("var4", 20).UserMissingValues(MissingValueType.OneDiscreteMissingValue, new[] { new DateTime(2020, 1, 1) })
             };
             var spssData = new SpssData { Metadata = new Metadata(variables), Data = new List<object?>() };
             var ms = new MemoryStream();
@@ -129,7 +129,7 @@ namespace SPSS.Tests
             var longStr = string.Join("", Enumerable.Range(0, 65536 / 16).Select(_ => "1234567890AB🤓"));
             var variables = new List<Variable>
             {
-                new Variable<string>("V" + longStr[1..^1], 65536) { Label = longStr, ValueLabels = new Dictionary<string, string> { [longStr] = longStr } }.MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { longStr }),
+                new Variable<string>("V" + longStr[1..^1], 65536) { Label = longStr, ValueLabels = new Dictionary<string, string> { [longStr] = longStr } }.UserMissingValues(MissingValueType.OneDiscreteMissingValue, new[] { longStr }),
             };
             var ms = new MemoryStream();
 
@@ -209,7 +209,7 @@ namespace SPSS.Tests
                         ["a"] = "valueLabel for a",
                         ["b"] = "valueLabel for b"
                     }
-                }.MissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
+                }.UserMissingValues(MissingValueType.OneDiscreteMissingValue, new[] { "-" }),
                 new Variable<string>("var1", 9)
                 {
                     Label = "label for var1", ValueLabels = new Dictionary<string, string>
@@ -226,7 +226,7 @@ namespace SPSS.Tests
                         [15.5] = "valueLabel for 15.5",
                         [16] = "valueLabel for 16"
                     }
-                }.MissingValues(new[] { 0d }),
+                }.UserMissingValues(new[] { 0d }),
                 new Variable<DateTime>("var4", 20)
                 {
                     Label = "label for var4",

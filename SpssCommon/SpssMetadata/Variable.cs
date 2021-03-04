@@ -93,21 +93,21 @@ namespace Spss.SpssMetadata
         }
 
 
-        public new Variable<T> MissingValues(T[] missingValues)
+        public Variable<T> UserMissingValues(T[] missingValues)
         {
             var length = missingValues.Length;
             if (length > 3) length = 3;
-            return MissingValues((MissingValueType) length, missingValues[..length]);
+            return UserMissingValues((MissingValueType) length, missingValues[..length]);
         }
 
-        public new Variable<T> MissingValues(MissingValueType missingValueType, T[] missingValues)
+        public Variable<T> UserMissingValues(MissingValueType missingValueType, T[] missingValues)
         {
             if (Math.Abs((int) missingValueType) != missingValues.Length) throw new InvalidOperationException($"Expected number of missing {Math.Abs((int) missingValueType)}!={missingValues.Length}");
             MissingValueType = missingValueType;
             if (typeof(DateTime) == typeof(T) || typeof(DateTime?) == typeof(T))
-                base.MissingValues = missingValues.Cast<DateTime>().Select(x => (object) x.SpssDate()).ToArray();
+                MissingValues = missingValues.Cast<DateTime>().Select(x => (object) x.SpssDate()).ToArray();
             else
-                base.MissingValues = missingValues.Cast<object>().ToArray();
+                MissingValues = missingValues.Cast<object>().ToArray();
             return this;
         }
     }
