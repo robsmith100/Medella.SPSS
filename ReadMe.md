@@ -5,7 +5,7 @@
 
 [![Build Status](https://medella.visualstudio.com/Spss/_apis/build/status/Anderman.Medella.SPSS?branchName=master)](https://medella.visualstudio.com/Spss/_build/latest?definitionId=12&branchName=master)
 
-![Nuget](https://img.shields.io/nuget/v/DataWriter.SPSS)
+![Nuget](https://img.shields.io/nuget/v/spsswriter)
 
 This library enables to read and write SPSS data files (.sav) on .net from and to a Stream. The library is UTF-8 safe.
 
