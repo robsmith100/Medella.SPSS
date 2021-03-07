@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Spss.DataReaders;
 using Spss.MetadataReaders;
-using SpssCommon;
 using Spss.SpssMetadata;
 
 namespace Spss
@@ -11,7 +10,7 @@ namespace Spss
     public class SpssReader : IDisposable
     {
         private readonly DataReader _dataReader;
-        private readonly Metadata _metaData = new(new List<Variable>());
+        private readonly Metadata _metaData = new Metadata(new List<Variable>());
         private readonly BinaryReader _reader;
         private readonly MetadataReader _metadataReader;
 

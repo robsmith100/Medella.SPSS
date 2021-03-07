@@ -45,7 +45,7 @@ namespace Spss.Models
         internal Dictionary<object, string>? ValueLabels => _variable.ValueLabels;
         internal byte[] ShortName8Bytes { get; set; } = null!;
         internal string ShortName { get; set; } = null!;
-        internal List<byte[]> GhostNames { get; } = new();
+        internal List<byte[]> GhostNames { get; } = new List<byte[]>();
         internal int LastGhostVariableLength { get; set; }
     }
 }

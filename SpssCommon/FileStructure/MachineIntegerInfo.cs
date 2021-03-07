@@ -12,6 +12,6 @@ namespace Spss.FileStructure
         private const int CompressionCode = 1;
         private const int Endianness = 2;
         private const int CharacterCode = 65001; //codepage for utf-8
-        public static readonly List<int> Items = new() { VersionMajor, VersionMinor, VersionRevision, MachineCode, FloatingPointRepresentation, CompressionCode, Endianness, CharacterCode };
+        public static readonly List<int> Items = new List<int>() { VersionMajor, VersionMinor, VersionRevision, MachineCode, FloatingPointRepresentation, CompressionCode, Endianness, CharacterCode };
     }
 }

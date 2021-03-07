@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using Spss.DataWriters;
 using Spss.MetadataWriters;
-using SpssCommon;
 using Spss.SpssMetadata;
 
 namespace Spss

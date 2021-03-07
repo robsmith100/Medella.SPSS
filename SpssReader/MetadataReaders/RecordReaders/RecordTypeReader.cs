@@ -41,7 +41,7 @@ namespace Spss.MetadataReaders.RecordReaders
         public void ReadValueLabelRecord()
         {
             var count = _reader.ReadInt32();
-            List<(byte[] value, byte[] label)> labels = new();
+            List<(byte[] value, byte[] label)> labels = new List<(byte[] value, byte[] label)>();
             for (var i = 0; i < count; i++)
             {
                 var value = _reader.ReadBytes(8);

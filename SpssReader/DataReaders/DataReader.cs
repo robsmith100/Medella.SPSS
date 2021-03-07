@@ -11,7 +11,7 @@ namespace Spss.DataReaders
 {
     internal class DataReader
     {
-        private readonly List<object?> _data = new();
+        private readonly List<object?> _data = new List<object?>();
         private readonly Metadata _metadata;
         private readonly BinaryReader _reader;
         private readonly byte[] _spacesBytes = Array.Empty<byte>();
@@ -51,7 +51,7 @@ namespace Spss.DataReaders
             var get8Bytes = GetBlock();
             var value = BitConverter.ToDouble(get8Bytes);
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            return value == double.MinValue ? null : value;
+            return value == double.MinValue ? (double?) null : value;
         }
 
         private string? ReadString(int length)

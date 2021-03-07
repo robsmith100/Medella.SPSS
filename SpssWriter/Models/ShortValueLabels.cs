@@ -4,8 +4,8 @@ namespace Spss.Models
 {
     public class ShortValueLabels
     {
-        public IDictionary<object, string> Labels { get; init; } = null!;
+        public IDictionary<object, string> Labels { get; set; } = null!;
 
-        public List<int> VariableIndex { get; init; } = null!;
+        public List<int> VariableIndex { get; set; } = null!;
     }
 }

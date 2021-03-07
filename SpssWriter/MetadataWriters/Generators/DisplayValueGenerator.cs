@@ -9,7 +9,7 @@ namespace Spss.MetadataWriters.Generators
     {
         public static List<DisplayParameter> GenerateDisplayValues(List<VariableWrapper> variables)
         {
-            List<DisplayParameter> displayValues = new();
+            List<DisplayParameter> displayValues = new List<DisplayParameter>();
             foreach (var variable in variables)
             {
                 var displayValue = new DisplayParameter { Measure = variable.Measure, Columns = variable.Columns, Alignment = variable.Alignment };

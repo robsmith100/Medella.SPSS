@@ -10,7 +10,7 @@ namespace Spss.MetadataReaders
 {
     public class MetadataReader
     {
-        private readonly MetadataInfo _metadataInfo = new();
+        private readonly MetadataInfo _metadataInfo = new MetadataInfo();
         private readonly BinaryReader _reader;
         private readonly RecordTypeInfoReader _recordTypeInfoReader;
         private readonly RecordTypeReader _recordTypeReader;

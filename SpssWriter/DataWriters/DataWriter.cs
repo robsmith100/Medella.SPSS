@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using Spss.Encodings;
 using Spss.FileStructure;
-using SpssCommon;
 using Spss.SpssMetadata;
 
 namespace Spss.DataWriters
@@ -147,7 +146,7 @@ namespace Spss.DataWriters
         private byte GetUncompressedCode(double? value) =>
             value is null
                 ? CompressedCode.SysMiss
-                : Math.Abs(value.Value % 1) < 0.00001 && value + _bias is > CompressedCode.Padding and < CompressedCode.EndOfFile
+                : Math.Abs(value.Value % 1) < 0.00001 && value + _bias  > CompressedCode.Padding && value + _bias < CompressedCode.EndOfFile
                     ? (byte) (value + _bias)
                     : CompressedCode.Uncompressed;
     }

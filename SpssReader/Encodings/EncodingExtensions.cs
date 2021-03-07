@@ -6,7 +6,9 @@ namespace Spss.Encodings
     {
         public static int GetCodePage(this int characterCode)
         {
+#if NETCOREAPP
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+#endif
             return characterCode switch
             {
                 2 => Encoding.ASCII.CodePage,

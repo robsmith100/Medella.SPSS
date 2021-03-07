@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using Spss.SpssMetadata;
 
-namespace SpssCommon
+namespace Spss
 {
     public class SpssData
     {
         public Metadata Metadata { get; set; } = null!;
-        public List<object?> Data { get; set; } = new();
+        public List<object?> Data { get; set; } = new List<object?>();
     }
 }

@@ -13,7 +13,7 @@ namespace Spss.MetadataWriters.RecordWriters
 {
     public class RecordTypeWriter
     {
-        private static readonly OutputFormat BlankOutputFormat = new(FormatType.A, 0x1d, 1);
+        private static readonly OutputFormat BlankOutputFormat = new OutputFormat(FormatType.A, 0x1d, 1);
         private static readonly byte[] BlankShortName = { 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20, 0x20 };
         private readonly Encoding _encoding;
         private readonly DateTimeFormatInfo _invariantCultureDateTimeFormat = CultureInfo.InvariantCulture.DateTimeFormat;

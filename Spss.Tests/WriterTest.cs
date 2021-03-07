@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Spss;
-using SpssCommon;
 using Spss.SpssMetadata;
 using Xunit;
 
