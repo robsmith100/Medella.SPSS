@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <Nullable>enable</Nullable>
-	    <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
-        <RootNamespace>Spss</RootNamespace>
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
+		<RootNamespace>Spss</RootNamespace>
 		<PackageProjectUrl>https://github.com/Anderman/Medella.SPSS</PackageProjectUrl>
-	    <RepositoryUrl>https://github.com/Anderman/Medella.SPSS</RepositoryUrl>
-			<Description>A cleancode library for writing spss .sav files</Description>
-    </PropertyGroup>
+		<RepositoryUrl>https://github.com/Anderman/Medella.SPSS</RepositoryUrl>
+		<Description>A cleancode library for writing spss .sav files</Description>
+		<PackageTags>sav; spss; spsslib;</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	</PropertyGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\SpssCommon\SpssCommon.csproj" />
