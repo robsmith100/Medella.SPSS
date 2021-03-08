@@ -23,6 +23,13 @@ steps:
     arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
     publishTestResults: true
 
+- task: DotNetCoreCLI@2
+  displayName: "dotnet test"
+  inputs:
+    command: 'test'
+    arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
+    publishTestResults: false
+
 - script: |
     call dotnet tool install -g dotnet-reportgenerator-globaltool
     call reportgenerator -reports:$(Build.SourcesDirectory)\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines;Cobertura
