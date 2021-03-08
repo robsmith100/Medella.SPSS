@@ -8,6 +8,8 @@
 
 ![test](https://img.shields.io/azure-devops/coverage/medella/spss/12)
 
+[Demo](https://spssreader.azurewebsites.net/api/Read) Spss to json convertor.
+
 This library enables to read and write SPSS data files (.sav) on .net from and to a Stream. The library is UTF-8 safe.
 
 It is available as a nuget package at https://www.nuget.org/packages/SpssReader en https://www.nuget.org/packages/SpssWriter, and can be installed using the package manager or by issueing:
