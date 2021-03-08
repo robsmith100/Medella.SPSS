@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Spss.Encodings;
-using Spss.Models;
 using Spss.FileStructure;
+using Spss.Models;
 using Spss.SpssMetadata;
 
 namespace Spss.MetadataReaders.RecordReaders

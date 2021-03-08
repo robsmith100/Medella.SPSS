@@ -1,9 +1,9 @@
 using System;
 using System.IO;
+using Spss.FileStructure;
 using Spss.MetadataReaders.Convertors;
 using Spss.MetadataReaders.RecordReaders;
 using Spss.Models;
-using Spss.FileStructure;
 using Spss.SpssMetadata;
 
 namespace Spss.MetadataReaders

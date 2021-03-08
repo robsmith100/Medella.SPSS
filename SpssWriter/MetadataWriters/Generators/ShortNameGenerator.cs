@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Spss.Encodings;
-using Spss.Models;
 using Spss.FileStructure;
+using Spss.Models;
+
 // ReSharper disable StringLiteralTypo
 
 namespace Spss.MetadataWriters.Generators
@@ -17,7 +18,6 @@ namespace Spss.MetadataWriters.Generators
 
         public ShortNameGenerator(Encoding encoding)
         {
-            
             _encoding = encoding;
             _shortNames = new HashSet<byte[]>(new ByteArrayEqualityComparer());
         }

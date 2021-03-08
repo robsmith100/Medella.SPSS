@@ -5,7 +5,7 @@ namespace Spss.FileStructure
     public static class SpssMath
     {
         private static readonly DateTime Epoch = new DateTime(1582, 10, 14, 0, 0, 0, DateTimeKind.Unspecified);
-        public static int GetNumberOfGhostVariables(int valueLength) => (valueLength - 1) / 252;
+        public static int GetNumberOfGhostVariables(int valueLength) => valueLength < 256 ? 0 : (valueLength - 1) / 252;
 
         public static int GetAllocatedSize(int valueLength) =>
             GetNumberOf32ByteBlocks(valueLength) * 8;

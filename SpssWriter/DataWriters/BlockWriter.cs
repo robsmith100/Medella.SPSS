@@ -72,7 +72,7 @@ namespace Spss.DataWriters
             WriteCompleteBlocks(currentFullBlockIndex);
 
             _uncompressedIndex -= currentFullBlockIndex;
-            Debug.Assert(_uncompressedIndex==0, "_uncompressedIndex should be 0");
+            Debug.Assert(_uncompressedIndex == 0, "_uncompressedIndex should be 0");
         }
 
         public void Flush()

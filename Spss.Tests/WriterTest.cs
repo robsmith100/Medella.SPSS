@@ -45,6 +45,13 @@ namespace SPSS.Tests
 'v1',1,'2020-01-01T00:00:00',
 'v2',1,null]}";
 
+        private const string Variable255 = @"{'Metadata':{'Bias':100,'Cases':-1,'HeaderCodePage':65001,'DataCodePage':65001,'Variables':[
+{'Name':'V1','FormatType':1,'SpssWidth':252,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':0,'MeasurementType':1},
+{'Name':'V2','FormatType':1,'SpssWidth':252,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':0,'MeasurementType':1},
+{'Name':'V3','FormatType':1,'SpssWidth':252,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':0,'MeasurementType':1}]},'Data':[
+'v1','v2','v3',
+'v11','v21','v31']}";
+
         [Fact]
         public void CanWriteFormatTypes()
         {
@@ -189,6 +196,29 @@ namespace SPSS.Tests
             Assert.Equal(Custom1.Replace(Environment.NewLine, ""), result);
         }
 
+        [Fact]
+        public void CanWrite255ByteVariable()
+        {
+            // Assign
+            var variables = new List<Variable> { new Variable<string>("V1", 255), new Variable<string>("V2", 255), new Variable<string>("V3", 255) };
+            using var ms = new MemoryStream();
+            var spss = new SpssWriter(new Metadata(variables), ms);
+            spss.MetadataWriter.Write();
+            spss.DataWriter.Write("v1");
+            spss.DataWriter.Write("v2");
+            spss.DataWriter.Write("v3");
+            spss.DataWriter.Write("v11");
+            spss.DataWriter.Write("v21");
+            spss.DataWriter.Write("v31");
+            spss.DataWriter.Flush();
+            // Assert
+            SaveToFile(ms, "variable255");
+            ms.Position = 0;
+            var spssData = SpssReader.Read(ms);
+            var result = JsonSerializer.Serialize(spssData).Replace("\"", "'");
+            Assert.Equal(Variable255.Replace(Environment.NewLine, ""), result);
+        }
+
         private static void SaveToFile(MemoryStream ms, string fileName)
         {
             ms.Position = 0;
@@ -242,7 +272,7 @@ namespace SPSS.Tests
                 null, null, null
             };
             var ms = new MemoryStream();
-            SpssWriter.Write(variables,data, ms);
+            SpssWriter.Write(variables, data, ms);
         }
     }
 }

@@ -7,6 +7,6 @@ namespace Spss.FileStructure
         private const ulong SystemMissingValue = 0xFFEFFFFFFFFFFFFFUL;
         private const ulong MissingHighestValue = 0x7FEFFFFFFFFFFFFFUL;
         private const ulong MissingLowestValue = 0xFFEFFFFFFFFFFFFEUL;
-        public static readonly List<ulong> Items = new List<ulong>() { SystemMissingValue, MissingHighestValue, MissingLowestValue };
+        public static readonly List<ulong> Items = new List<ulong> { SystemMissingValue, MissingHighestValue, MissingLowestValue };
     }
 }

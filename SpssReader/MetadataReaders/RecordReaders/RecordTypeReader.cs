@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Spss.Models;
 using Spss.FileStructure;
+using Spss.Models;
 using Spss.SpssMetadata;
 
 namespace Spss.MetadataReaders.RecordReaders
@@ -75,7 +75,7 @@ namespace Spss.MetadataReaders.RecordReaders
             if (Math.Abs(missingValueType) != 0)
                 ReadMissing(properties);
 
-            var blockWidth = ReadGhostAndBlankRecords(valueLength);
+            var blockWidth = ReadBlankRecords(valueLength);
 
             properties.ValueLength = blockWidth;
             properties.SpssWidth = formatType == (int) FormatType.A ? blockWidth : spssWidth;
@@ -96,25 +96,15 @@ namespace Spss.MetadataReaders.RecordReaders
             return label;
         }
 
-        private int ReadGhostAndBlankRecords(int valueLength)
+        private int ReadBlankRecords(int valueLength)
         {
             var lengthTotal = 0;
             if (valueLength <= 8) return 8;
-            do
-            {
-                var skip = SpssMath.GetAllocatedSize(valueLength);
-                lengthTotal += skip == 256 ? 252 : valueLength;
-                skip -= 8;
-                _reader.BaseStream.Seek(skip * 4, SeekOrigin.Current);
-                if (valueLength < 255) break;
-                _reader.ReadInt32(); //02
-                valueLength = _reader.ReadInt32();
-                var hasLabel = _reader.ReadInt32() == 1;
-                _reader.BaseStream.Seek(32 - 12, SeekOrigin.Current);
-                if (hasLabel) ReadLabel();
-            } while (valueLength > 8);
-
-            return lengthTotal + (valueLength <= 8 ? 8 : 0);
+            var skip = SpssMath.GetAllocatedSize(valueLength);
+            lengthTotal += skip == 256 ? 252 : valueLength;
+            skip -= 8;
+            _reader.BaseStream.Seek(skip * 4, SeekOrigin.Current);
+            return lengthTotal;
         }
     }
 }

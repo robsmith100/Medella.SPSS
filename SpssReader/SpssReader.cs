@@ -11,8 +11,8 @@ namespace Spss
     {
         private readonly DataReader _dataReader;
         private readonly Metadata _metaData = new Metadata(new List<Variable>());
-        private readonly BinaryReader _reader;
         private readonly MetadataReader _metadataReader;
+        private readonly BinaryReader _reader;
 
 
         private SpssReader(Stream fileStream)

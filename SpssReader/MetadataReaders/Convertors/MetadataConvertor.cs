@@ -20,14 +20,15 @@ namespace Spss.MetadataReaders.Convertors
 
         public void Convert()
         {
-            var variables = _metadataInfo.Variables
-                .Select(x => (shortName: _encoding.GetString(x.ShortName).TrimEnd(), label: _encoding.GetString(x.Label).TrimEnd(), v: x))
-                .ToDictionary(x => x.shortName, x => CreateVariable(x.shortName, x.label, x.v));
+            var variableList = _metadataInfo.Variables.Select(x => CreateVariable(_encoding.GetString(x.ShortName).TrimEnd(), _encoding.GetString(x.Label).TrimEnd(), x)).ToList();
+            UpdateVariableValueLength(variableList);
+            UpdateVariableDisplayParameters(variableList);
             var rawIndex2Index = _metadataInfo.Variables.Select((x, i) => (i, x.Index)).ToDictionary(x => x.Index, x => x.i);
-            UpdateVariableValueLength(variables);
+            UpdateVariableShortValueLabels(variableList, rawIndex2Index);
+
+            variableList = RemoveGhostVariable(variableList);
+            var variables = variableList.ToDictionary(x => x.Name);
             UpdateVariableNames(variables);
-            UpdateVariableDisplayParameters(variables);
-            UpdateVariableShortValueLabels(variables, rawIndex2Index);
             UpdateVariableLongValueLabels(variables);
             UpdateVariableLongStringMissing(variables);
             _metadataInfo.Metadata.Variables = variables.Values.ToList();
@@ -75,13 +76,12 @@ namespace Spss.MetadataReaders.Convertors
             }
         }
 
-        private void UpdateVariableShortValueLabels(Dictionary<string, Variable> variables, Dictionary<int, int> rawIndex2Index)
+        private void UpdateVariableShortValueLabels(List<Variable> variables, Dictionary<int, int> rawIndex2Index)
         {
-            var array = variables.Select(x => x.Value).ToArray();
             foreach (var entry in _metadataInfo.ShortValueLabels)
             {
                 var indexes = entry.Indexes.Select(x => rawIndex2Index[x]).ToList();
-                var isString = array[indexes.First()].FormatType == FormatType.A;
+                var isString = variables[indexes.First()].FormatType == FormatType.A;
                 var valueLabels = entry.Labels;
                 var v = new Dictionary<object, string>();
                 foreach (var (valueBytes, labelBytes) in valueLabels)
@@ -91,19 +91,18 @@ namespace Spss.MetadataReaders.Convertors
                     v[value] = label;
                 }
 
-                indexes.ForEach(x => array[x].ValueLabels = v);
+                indexes.ForEach(x => variables[x].ValueLabels = v);
             }
         }
 
-        private void UpdateVariableDisplayParameters(Dictionary<string, Variable> variables)
+        private void UpdateVariableDisplayParameters(List<Variable> variables)
         {
-            var array = variables.Select(x => x.Value).ToArray();
             for (var i = 0; i < _metadataInfo.DisplayParameters.Count; i++)
             {
                 var parameter = _metadataInfo.DisplayParameters[i];
-                array[i].Alignment = parameter.Alignment;
-                array[i].Columns = parameter.Columns;
-                array[i].MeasurementType = parameter.Measure;
+                variables[i].Alignment = parameter.Alignment;
+                variables[i].Columns = parameter.Columns;
+                variables[i].MeasurementType = parameter.Measure;
             }
         }
 
@@ -114,12 +113,29 @@ namespace Spss.MetadataReaders.Convertors
             longNames.ForEach(x => variables[x.shortName].Name = x.longName);
         }
 
-        private void UpdateVariableValueLength(Dictionary<string, Variable> variables)
+        private void UpdateVariableValueLength(List<Variable> variables)
         {
             if (_metadataInfo.ValueLengthVeryLongString == null) return;
             var entries = _encoding.GetString(_metadataInfo.ValueLengthVeryLongString).Replace("\t", "").Split('\0', StringSplitOptions.RemoveEmptyEntries);
-            var lengths = entries.Select(x => x.Split('=')).Select(x => (name: x[0], lentgh: int.Parse(x[1]))).ToList();
-            lengths.ForEach(x => variables[x.name].SpssWidth = x.lentgh);
+            var lengths = entries.Select(x => x.Split('=')).Select(x => (name: x[0], lentgh: int.Parse(x[1]))).ToDictionary(x => x.name, x => x.lentgh);
+            foreach (var variable in variables)
+                if (lengths.ContainsKey(variable.Name))
+                    variable.SpssWidth = lengths[variable.Name];
+        }
+
+        private List<Variable> RemoveGhostVariable(List<Variable> variables)
+        {
+            var result = new List<Variable>();
+            var skip = 0;
+            foreach (var value in variables)
+            {
+                if (skip-- > 0) continue;
+                result.Add(value);
+                var length = value.SpssWidth;
+                skip = length < 256 ? 0 : length / 252;
+            }
+
+            return result;
         }
     }
 }

@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Spss.Encodings;
+using Spss.FileStructure;
 using Spss.MetadataWriters.Generators;
 using Spss.MetadataWriters.RecordWriters;
 using Spss.Models;
-using Spss.FileStructure;
 using Spss.SpssMetadata;
 
 namespace Spss.MetadataWriters

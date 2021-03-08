@@ -1,4 +1,3 @@
-
 namespace Spss.SpssMetadata
 {
     /// <summary>
