@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Spss.FileStructure;
+using Spss.Models;
 using Spss.SpssMetadata;
 
 namespace Spss.DataReaders
@@ -12,7 +13,7 @@ namespace Spss.DataReaders
     internal class DataReader
     {
         private readonly List<object?> _data = new List<object?>();
-        private readonly Metadata _metadata;
+        private readonly MetadataInfo _metadataInfo;
         private readonly BinaryReader _reader;
         private readonly byte[] _spacesBytes = Array.Empty<byte>();
         private readonly long _streamLength;
@@ -22,21 +23,21 @@ namespace Spss.DataReaders
         private int _uncompressedBufferMax;
         private int _uncompressedBufferPosition;
 
-        public DataReader(BinaryReader reader, Metadata metadata)
+        public DataReader(BinaryReader reader, MetadataInfo metadataInfo)
         {
             _reader = reader;
-            _metadata = metadata;
+            _metadataInfo = metadataInfo;
             _streamLength = _reader.BaseStream.Length;
         }
 
         public List<object?> Read()
         {
-            _encoding = Encoding.GetEncoding(_metadata.DataCodePage);
+            _encoding = Encoding.GetEncoding(_metadataInfo.Metadata.DataCodePage);
             while (true)
             {
                 if (_reader.BaseStream.Position == _streamLength && _uncompressedBufferPosition == _uncompressedBufferMax)
                     return _data;
-                foreach (var variable in _metadata.Variables)
+                foreach (var variable in _metadataInfo.Metadata.Variables)
                 {
                     var formatType = variable.FormatType;
                     if (formatType == FormatType.A) _data.Add(ReadString(variable.SpssWidth));
@@ -48,11 +49,12 @@ namespace Spss.DataReaders
 
         private double? ReadDouble()
         {
-            var get8Bytes = GetBlock();
-            var value = BitConverter.ToDouble(get8Bytes);
+            var bytes = GetBlock();
+            var value = _metadataInfo.ConvertDouble(bytes);
             // ReSharper disable once CompareOfFloatsByEqualityOperator
-            return value == double.MinValue ? (double?) null : value;
+            return value == double.MinValue ? (double?)null : value;
         }
+
 
         private string? ReadString(int length)
         {
@@ -80,6 +82,8 @@ namespace Spss.DataReaders
 
         private byte[] GetBlock()
         {
+            if (_metadataInfo.Compressed == 0)
+                return _reader.ReadBytes(8);
             if (_uncompressedBufferPosition < _uncompressedBufferMax) return _uncompressedBuffer[_uncompressedBufferPosition++] ?? Array.Empty<byte>();
             DecompressData();
             return _uncompressedBuffer[_uncompressedBufferPosition++] ?? Array.Empty<byte>();
@@ -97,9 +101,9 @@ namespace Spss.DataReaders
                 if (code == CompressedCode.Padding) {}
                 else if (code == CompressedCode.Uncompressed) todo.Add(position++);
                 else if (code == CompressedCode.SpaceCharsBlock) _uncompressedBuffer[position++] = _spacesBytes;
-                else if (code == CompressedCode.SysMiss) _uncompressedBuffer[position++] = _sysMiss;
+                else if (code == CompressedCode.SysMiss) _uncompressedBuffer[position++] = _sysMiss; 
                 else if (code == CompressedCode.EndOfFile) break;
-                else _uncompressedBuffer[position++] = BitConverter.GetBytes((double) (code - _metadata.Bias));
+                else _uncompressedBuffer[position++] = _metadataInfo.ConvertDouble(code - _metadataInfo.Metadata.Bias);
 
             foreach (var i in todo)
                 _uncompressedBuffer[i] = _reader.ReadBytes(8);

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
 		<Nullable>enable</Nullable>
@@ -22,6 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Update="TestFiles\BigEndian.sav">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="TestFiles\Longstring.sav">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

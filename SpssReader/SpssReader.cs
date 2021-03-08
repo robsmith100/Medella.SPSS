@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Spss.DataReaders;
 using Spss.MetadataReaders;
+using Spss.Models;
 using Spss.SpssMetadata;
 
 namespace Spss
@@ -10,14 +11,14 @@ namespace Spss
     public class SpssReader : IDisposable
     {
         private readonly DataReader _dataReader;
-        private readonly Metadata _metaData = new Metadata(new List<Variable>());
+        private readonly MetadataInfo _metaData = new MetadataInfo { Metadata = new Metadata(new List<Variable>()) };
         private readonly MetadataReader _metadataReader;
-        private readonly BinaryReader _reader;
+        private readonly Reader _reader;
 
 
         private SpssReader(Stream fileStream)
         {
-            _reader = new BinaryReader(fileStream);
+            _reader = new Reader(fileStream, _metaData);
             _metadataReader = new MetadataReader(_reader, _metaData);
             _dataReader = new DataReader(_reader, _metaData);
         }
@@ -33,7 +34,7 @@ namespace Spss
             var metadata = reader._metadataReader.Read();
             var data = reader._dataReader.Read();
             reader.Dispose();
-            return new SpssData { Metadata = metadata, Data = data };
+            return new SpssData { Metadata = metadata.Metadata, Data = data };
         }
     }
 }

@@ -39,6 +39,15 @@ null,null,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
         private const string LongstringSav = @"{'Metadata':{'Bias':100,'Cases':0,'HeaderCodePage':65001,'DataCodePage':65001,'Variables':[
 {'Name':'a\uD83E\uDD13\uD83E\uDD13','FormatType':1,'SpssWidth':9,'DecimalPlaces':0,'Label':'label for name1','ValueLabels':{'\uD83E\uDD13\uD83E\uDD13b':'b\uD83E\uDD13\uD83E\uDD13','a':'Label for a','b':'Label for b'},'MissingValueType':2,'MissingValues':['a','b'],'Columns':8,'Alignment':0,'MeasurementType':1}]},'Data':[]}";
 
+        private const string BigEndian = @"{'Metadata':{'Bias':0,'Cases':50,'HeaderCodePage':20127,'DataCodePage':20127,'Variables':[
+{'Name':'ID','FormatType':5,'SpssWidth':5,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1},
+{'Name':'SEX','FormatType':5,'SpssWidth':5,'DecimalPlaces':0,'Label':null,'ValueLabels':{'1':'MALE','2':'FEMALE'},'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1},
+{'Name':'GROUP','FormatType':5,'SpssWidth':5,'DecimalPlaces':0,'Label':null,'ValueLabels':{'0':'Control','1':'Treatment'},'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1},
+{'Name':'AGE','FormatType':5,'SpssWidth':5,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1},
+{'Name':'PRETEST','FormatType':5,'SpssWidth':5,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1},
+{'Name':'POSTTEST','FormatType':5,'SpssWidth':5,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1}]},'Data':[
+101,101,100,116,36.37699261646427,53.321541454892696,102,102,100,105,55.067910808804164,64.9424958680917,103,102,101,113,52.73154603476168,61.62222317860627,104,102,100,114,58.5724579698679,73.24317759180526,105,101,100,106,41.049722164549244,54.15160962726405,106,102,100,112,76.09519377518654,111.01127943470202,107,101,101,106,43.38608693859173,50.83133693777862,108,102,100,127,50.39518126071919,62.8673254371633,109,102,100,107,66.7497346790166,67.43270038520576,110,101,100,113,69.08609945305909,60.79215500623491,111,102,101,106,59.74064035688914,59.1320186614922,112,102,100,107,56.23609319582541,65.77256404046305,113,102,100,128,41.049722164549244,62.452291350977625,114,102,101,104,43.38608693859173,59.96208683386355,115,101,100,108,71.42246422710157,56.641814144378124,116,101,101,126,43.38608693859173,47.511064248293195,117,101,101,109,52.73154603476168,66.60263221283441,118,102,101,106,64.41336990497412,61.62222317860627,119,102,100,106,66.7497346790166,65.77256404046305,120,101,100,105,41.049722164549244,55.81174597200677,121,101,100,112,45.72245171263422,51.661405110149985,122,101,101,105,57.40427558284665,57.47188231674948,123,102,100,118,52.73154603476168,62.452291350977625,124,102,101,110,55.067910808804164,62.452291350977625,125,102,101,116,52.73154603476168,57.47188231674948,126,102,101,107,57.40427558284665,66.60263221283441,127,101,101,117,43.38608693859173,49.17120059303591,128,101,101,107,45.72245171263422,50.83133693777862,129,101,100,107,43.38608693859173,53.321541454892696,130,101,100,104,45.72245171263422,60.79215500623491,131,102,101,106,64.41336990497412,60.79215500623491,132,101,101,111,48.058816486676704,53.321541454892696,133,102,101,117,62.077005130931624,57.47188231674948,134,102,101,109,48.058816486676704,59.96208683386355,135,102,101,113,57.40427558284665,58.30195048912084,136,101,100,119,36.37699261646427,55.81174597200677,137,101,101,120,50.39518126071919,49.17120059303591,138,101,100,106,69.08609945305909,58.30195048912084,139,101,101,106,41.049722164549244,59.96208683386355,140,101,101,115,45.72245171263422,55.81174597200677,141,101,100,120,48.058816486676704,58.30195048912084,142,101,101,107,57.40427558284665,61.62222317860627,143,101,100,117,43.38608693859173,73.24317759180526,144,101,101,107,45.72245171263422,54.15160962726405,145,101,100,107,43.38608693859173,111.01127943470202,146,102,100,104,45.72245171263422,50.83133693777862,147,102,101,106,64.41336990497412,62.8673254371633,148,102,100,111,48.058816486676704,67.43270038520576,149,102,101,105,39.881539777528005,60.79215500623491,150,102,100,114,29.36789829433681,64.11242769572034]}";
+
         private const string ShortStringsSav = @"{'Metadata':{'Bias':100,'Cases':0,'HeaderCodePage':65001,'DataCodePage':65001,'Variables':[
 {'Name':'a\uD83E\uDD13\uD83E\uDD13','FormatType':1,'SpssWidth':32767,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':8,'Alignment':0,'MeasurementType':1},
 {'Name':'a\uD83E\uDD13\uD83E\uDD131','FormatType':1,'SpssWidth':32767,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':8,'Alignment':0,'MeasurementType':1},
@@ -138,6 +147,20 @@ null,null,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             // Assert
             var result = JsonSerializer.Serialize(spssData).Replace("\"", "'");
             Assert.Equal(MaxStringSav.Replace(NewLine, ""), result);
+        }
+
+        [Fact]
+        public void ShouldReadBigEndianSav()
+        {
+            // Assign
+            var fileStream = new FileStream("TestFiles/BigEndian.sav", FileMode.Open, FileAccess.Read, FileShare.Read);
+
+            // Act
+            var spssData = SpssReader.Read(fileStream);
+
+            // Assert
+            var result = JsonSerializer.Serialize(spssData).Replace("\"", "'");
+            Assert.Equal(BigEndian.Replace(NewLine, ""), result);
         }
 
         private void SampleReader()

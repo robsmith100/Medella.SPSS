@@ -20,6 +20,7 @@ namespace Spss.MetadataReaders.Convertors
 
         public void Convert()
         {
+            _metadataInfo.Metadata.Cases = _metadataInfo.EnsureEndianSupport(_metadataInfo.Metadata.Cases);
             var variableList = _metadataInfo.Variables.Select(x => CreateVariable(_encoding.GetString(x.ShortName).TrimEnd(), _encoding.GetString(x.Label).TrimEnd(), x)).ToList();
             UpdateVariableValueLength(variableList);
             UpdateVariableDisplayParameters(variableList);
@@ -86,7 +87,7 @@ namespace Spss.MetadataReaders.Convertors
                 var v = new Dictionary<object, string>();
                 foreach (var (valueBytes, labelBytes) in valueLabels)
                 {
-                    var value = isString ? _encoding.GetString(valueBytes).TrimEnd() : (object) BitConverter.ToDouble(valueBytes);
+                    var value = isString ? _encoding.GetString(valueBytes).TrimEnd() : (object) _metadataInfo.ConvertDouble(valueBytes);
                     var label = _encoding.GetString(labelBytes).TrimEnd();
                     v[value] = label;
                 }
@@ -108,6 +109,7 @@ namespace Spss.MetadataReaders.Convertors
 
         private void UpdateVariableNames(Dictionary<string, Variable> variables)
         {
+            if (_metadataInfo.LongVariableNames == null) return;
             var entries = _encoding.GetString(_metadataInfo.LongVariableNames).Split('\t');
             var longNames = entries.Select(x => x.Split('=')).Select(x => (shortName: x[0], longName: x[1])).ToList();
             longNames.ForEach(x => variables[x.shortName].Name = x.longName);

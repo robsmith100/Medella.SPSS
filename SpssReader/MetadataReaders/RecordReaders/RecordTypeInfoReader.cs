@@ -123,7 +123,8 @@ namespace Spss.MetadataReaders.RecordReaders
 
         private void ReadMachineIntegerRecord()
         {
-            _reader.BaseStream.Seek(4 + 4 + 7 * 4, SeekOrigin.Current); //skip size+count+7 fields
+            _reader.BaseStream.Seek(4 + 4 + 6 * 4, SeekOrigin.Current); //skip size+count+6 fields
+            _metadataInfo.IsLittleEndian = _reader.ReadInt32() == 2;
             _metadataInfo.Metadata.DataCodePage = _metadataInfo.Metadata.HeaderCodePage = _reader.ReadInt32().GetCodePage();
         }
     }

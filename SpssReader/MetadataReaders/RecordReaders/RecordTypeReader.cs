@@ -12,10 +12,10 @@ namespace Spss.MetadataReaders.RecordReaders
     {
         private readonly MetadataInfo _metadataInfo;
 
-        private readonly BinaryReader _reader;
+        private readonly Reader _reader;
         private int _currentIndex = 1;
 
-        public RecordTypeReader(BinaryReader reader, MetadataInfo metadataInfo)
+        public RecordTypeReader(Reader reader, MetadataInfo metadataInfo)
         {
             _reader = reader;
             _metadataInfo = metadataInfo;
@@ -31,7 +31,7 @@ namespace Spss.MetadataReaders.RecordReaders
         {
             _reader.BaseStream.Seek(60 + 4, SeekOrigin.Current);
             _reader.ReadInt32();
-            if (_reader.ReadInt32() != 1) throw new InvalidOperationException("Can't read uncompressed files");
+            _metadataInfo.Compressed = _reader.ReadInt32();
             _reader.ReadInt32();
             _metadataInfo.Metadata.Cases = _reader.ReadInt32();
             _metadataInfo.Metadata.Bias = (int) _reader.ReadDouble();

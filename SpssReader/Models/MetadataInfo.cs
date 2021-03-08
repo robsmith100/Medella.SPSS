@@ -12,7 +12,9 @@ namespace Spss.Models
         public List<LongValueLabel> LongValueLabels { get; set; } = new List<LongValueLabel>();
         public List<LongStringMissing> LongStringMissing { get; set; } = new List<LongStringMissing>();
         public List<DisplayParameter> DisplayParameters { get; set; } = new List<DisplayParameter>();
-        public byte[] LongVariableNames { get; set; } = null!;
+        public byte[]? LongVariableNames { get; set; }
         public byte[]? ValueLengthVeryLongString { get; set; }
+        public int Compressed { get; set; }
+        public bool IsLittleEndian { get; set; } = true;
     }
 }
