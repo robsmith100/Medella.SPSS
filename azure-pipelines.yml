@@ -16,13 +16,41 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@1
+- task: DotNetCoreCLI@2
+  displayName: "dotnet test"
+  inputs:
+    command: 'test'
+    arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
+    publishTestResults: true
 
 - task: DotNetCoreCLI@2
+  displayName: "dotnet test"
+  inputs:
+    command: 'test'
+    arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
+    publishTestResults: false
+
+- script: |
+    call dotnet tool install -g dotnet-reportgenerator-globaltool
+    call reportgenerator -reports:$(Build.SourcesDirectory)\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines;Cobertura
+  displayName: "Generate Coverage result"
+  enabled: "true"
+
+- task: PublishCodeCoverageResults@1
+  displayName: "Publish code coverage"
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: "$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml"
+    reportDirectory: "$(Build.SourcesDirectory)/CodeCoverage"
+  enabled: "true"
+- task: DotNetCoreCLI@2
+  displayName: "dotnet pack"
   inputs:
     command: 'pack'
     packagesToPack: '**/*.csproj'
     versioningScheme: 'byBuildNumber'
 - task: NuGetCommand@2
+  enabled: true
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
