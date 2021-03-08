@@ -1,11 +1,12 @@
 # C# SPSS SAV file reader and writer library
 
-| Branch | Build status |
-| ------ | ------------ |
-
 [![Build Status](https://medella.visualstudio.com/Spss/_apis/build/status/Anderman.Medella.SPSS?branchName=master)](https://medella.visualstudio.com/Spss/_build/latest?definitionId=12&branchName=master)
 
 ![Nuget](https://img.shields.io/nuget/v/spsswriter)
+
+![test](https://img.shields.io/azure-devops/tests/medella/spss/12)
+
+![test](https://img.shields.io/azure-devops/coverage/medella/spss/12)
 
 This library enables to read and write SPSS data files (.sav) on .net from and to a Stream. The library is UTF-8 safe.
 
