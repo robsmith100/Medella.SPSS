@@ -20,7 +20,7 @@ steps:
   displayName: "dotnet test"
   inputs:
     command: 'test'
-    arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura"
+    arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
 
 - script: |
     call dotnet tool install -g dotnet-reportgenerator-globaltool
