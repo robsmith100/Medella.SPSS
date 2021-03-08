@@ -21,7 +21,7 @@ steps:
   inputs:
     command: 'test'
     arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
-    publishTestResults: false
+    publishTestResults: true
 
 - script: |
     call dotnet tool install -g dotnet-reportgenerator-globaltool
@@ -29,6 +29,13 @@ steps:
   displayName: "Generate Coverage result"
   enabled: "true"
 
+- task: PublishCodeCoverageResults@1
+  displayName: "Publish code coverage"
+  inputs:
+    codeCoverageTool: Cobertura
+    summaryFileLocation: "$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml"
+    reportDirectory: "$(Build.SourcesDirectory)/CodeCoverage"
+  enabled: "true"
 - task: DotNetCoreCLI@2
   displayName: "dotnet pack"
   inputs:
