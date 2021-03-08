@@ -2,7 +2,7 @@
 
 [![Build Status](https://medella.visualstudio.com/Spss/_apis/build/status/Anderman.Medella.SPSS?branchName=master)](https://medella.visualstudio.com/Spss/_build/latest?definitionId=12&branchName=master)
 
-[![Nuget](https://www.nuget.org/packages/SpssReader/)](https://img.shields.io/nuget/v/spsswriter)
+[![Nuget](https://img.shields.io/nuget/v/spsswriter)](https://www.nuget.org/packages/SpssReader/)
 
 ![test](https://img.shields.io/azure-devops/tests/medella/spss/12)
 
