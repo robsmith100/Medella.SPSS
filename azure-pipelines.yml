@@ -21,6 +21,7 @@ steps:
   inputs:
     command: 'test'
     arguments: $(Build.SourcesDirectory) --configuration $(BuildConfiguration) --collect:"XPlat Code Coverage"
+    publishTestResults: false
 
 - script: |
     call dotnet tool install -g dotnet-reportgenerator-globaltool
