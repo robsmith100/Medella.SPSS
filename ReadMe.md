@@ -2,11 +2,11 @@
 
 [![Build Status](https://medella.visualstudio.com/Spss/_apis/build/status/Anderman.Medella.SPSS?branchName=master)](https://medella.visualstudio.com/Spss/_build/latest?definitionId=12&branchName=master)
 
-![Nuget](https://img.shields.io/nuget/v/spsswriter)
+[![Nuget](https://img.shields.io/nuget/v/spsswriter)](https://www.nuget.org/packages/SpssReader/)
 
-![test](https://img.shields.io/azure-devops/tests/medella/spss/12)
+[![test](https://img.shields.io/azure-devops/tests/medella/spss/12)](https://medella.visualstudio.com/Spss/_build/results?buildId=514&view=ms.vss-test-web.build-test-results-tab)
 
-![test](https://img.shields.io/azure-devops/coverage/medella/spss/12)
+[![test](https://img.shields.io/azure-devops/coverage/medella/spss/12)](https://medella.visualstudio.com/Spss/_build/results?buildId=514&view=codecoverage-tab)
 
 [Demo](https://spssreader.azurewebsites.net/api/Read) Spss to json convertor.
 
