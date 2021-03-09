@@ -43,12 +43,17 @@ namespace Spss.MetadataReaders.RecordReaders
         private void ReadLongStringMissing()
         {
             _reader.ReadInt32(); //count=1
-            _reader.ReadInt32(); //length
-            var variable = _reader.ReadBytes(_reader.ReadInt32());
-            var missingCount = _reader.ReadByte();
-            var missingLength = _reader.ReadInt32();
-            var missingValues = Enumerable.Range(0, missingCount).Select(_ => _reader.ReadBytes(missingLength)).ToList();
-            _metadataInfo.LongStringMissing.Add(new LongStringMissing(variable, missingValues));
+            var totLength = _reader.ReadInt32(); //length
+            do
+            {
+                var varLength = _reader.ReadInt32();
+                var variable = _reader.ReadBytes(varLength);
+                var missingCount = _reader.ReadByte();
+                var missingLength = _reader.ReadInt32();
+                var missingValues = Enumerable.Range(0, missingCount).Select(_ => _reader.ReadBytes(missingLength)).ToList();
+                _metadataInfo.LongStringMissing.Add(new LongStringMissing(variable, missingValues));
+                totLength -= 4 + varLength + 1 + 4 + missingCount * missingLength;
+            } while (totLength > 0);
         }
 
         private void ReadLongStringValueLabels()
@@ -105,9 +110,9 @@ namespace Spss.MetadataReaders.RecordReaders
             {
                 _metadataInfo.DisplayParameters.Add(new DisplayParameter
                 {
-                    Measure = (MeasurementType) _reader.ReadInt32(),
+                    Measure = (MeasurementType)_reader.ReadInt32(),
                     Columns = items == 3 ? _reader.ReadInt32() : 5,
-                    Alignment = (Alignment) _reader.ReadInt32(),
+                    Alignment = (Alignment)_reader.ReadInt32(),
                 });
                 var ghosts = SpssMath.GetNumberOf256ByteBlocks(variable.ValueLength) - 1;
                 _reader.BaseStream.Seek(ghosts * items * 4, SeekOrigin.Current);

@@ -49,6 +49,7 @@ namespace Spss.MetadataReaders
                 (int) RecordType.ValueLabelRecord => _recordTypeReader.ReadValueLabelRecord,
                 (int) RecordType.InfoRecord => _recordTypeInfoReader.ReadInfoRecord(),
                 (int) RecordType.EndRecord => _recordTypeReader.ReadEndRecord,
+                _ => throw new InvalidOperationException($"Unknown recordType {recordType:x8} at pos {_reader.BaseStream.Position - 4:x8}")
             };
         }
     }

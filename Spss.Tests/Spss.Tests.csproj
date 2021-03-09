@@ -22,26 +22,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="TestFiles\BigEndian.sav">
+      <None Update="TestFiles\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\Longstring.sav">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\MaxString.sav">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\MissingValues.sav">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\ShortStrings.sav">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\test.sav">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="TestFiles\cakespss1000similarvars.sav">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 	<ItemGroup>
