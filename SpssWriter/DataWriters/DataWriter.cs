@@ -115,7 +115,7 @@ namespace Spss.DataWriters
             var byteLength = bytes.Length;
             WriteStringBytes(bytes);
             _writer.AddPadding();
-            var writtenBytes = byteLength / 255 * 256 + (byteLength + 7) % 255 / 8 * 8;
+            var writtenBytes = byteLength / 255 * 256 + (byteLength % 255 + 7) / 8 * 8;
 
             while (writtenBytes < rawVariableLength)
             {

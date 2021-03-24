@@ -164,6 +164,7 @@ null,null,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
             var result = JsonSerializer.Serialize(spssData).Replace("\"", "'");
             Assert.Equal(BigEndian.Replace(NewLine, ""), result);
         }
+
         [Fact]
         public void ShouldReadLearningWithMultiLongStringMissingSav()
         {
