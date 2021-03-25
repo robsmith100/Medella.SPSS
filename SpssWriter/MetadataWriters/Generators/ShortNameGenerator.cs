@@ -49,8 +49,7 @@ namespace Spss.MetadataWriters.Generators
                 record.LastGhostVariableLength = record.ValueLength % 252;
                 for (var j = 0; j < ghostVariables; j++)
                 {
-                    var sn = _encoding.GetString(record.ShortName8Bytes).TrimEnd();
-                    const int maxLengthPrefix = 5;
+                    var sn = _encoding.GetString(GetShortNameByteArray(record.Name)).TrimEnd(); const int maxLengthPrefix = 5;
                     var prefix = _encoding.GetString(sn, maxLengthPrefix);
                     var shortName = _encoding.GetPaddedValueAsByteArray(prefix + '0', 8);
                     record.GhostNames.Add(GetUniqueShortName(shortName, index => $"{prefix}{GetGhostSuffix(index)}"));
