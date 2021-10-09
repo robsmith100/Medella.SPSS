@@ -27,7 +27,7 @@ namespace Spss.MetadataWriters
             _variables = metadata.Variables.Select(x => new VariableWrapper(x)).ToList();
             _encoding = _encoding = Encoding.GetEncoding(metadata.HeaderCodePage, new RemoveReplacementCharEncoderFallback(), DecoderFallback.ReplacementFallback);
 
-            ValidateVariables();
+            EnsureValidVariables();
             new ShortNameGenerator(_encoding).GenerateShortNames(_variables);
             _shortValueLabels = ValueLabelIndexGenerator.GenerateLabelIndexes(_variables);
             _displayValues = DisplayValueGenerator.GenerateDisplayValues(_variables);
@@ -51,7 +51,7 @@ namespace Spss.MetadataWriters
             _recordTypeWriter.WriteDictionaryTerminationRecord();
         }
 
-        public void ValidateVariables()
+        public void EnsureValidVariables()
         {
             foreach (var variable in _variables)
             {
@@ -60,8 +60,8 @@ namespace Spss.MetadataWriters
 
                 if (variable.ValueLength > 32767) variable.ValueLength = 32767;
                 if (variable.ValueLabels == null) return;
-                foreach (var label in variable.ValueLabels)
-                    variable.ValueLabels[label.Key] = TrimMaxLength(label.Value, 120)!;
+                foreach (var key in variable.ValueLabels.Keys.ToList())
+                    variable.ValueLabels[key] = TrimMaxLength(variable.ValueLabels[key], 120)!;
             }
         }
 

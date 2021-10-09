@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using Spss;
+using Spss.MetadataWriters;
 using Spss.SpssMetadata;
 using Xunit;
 
@@ -106,6 +107,27 @@ namespace SPSS.Tests
             var spssData2 = SpssReader.Read(ms);
             var result = JsonSerializer.Serialize(spssData2).Replace("\"", "'");
             Assert.Equal(Labels.Replace(Environment.NewLine, ""), result);
+        }
+
+        [Fact]
+        public void TestMaxLengthValueLabel()
+        {
+            // Assign
+            var ms = new MemoryStream();
+            var variables = new List<Variable>
+            {
+                new Variable<string>(new string('n',65), 32768) { Label = new string('l',255), ValueLabels = new Dictionary<string, string> { ["a"] = new string('v',121) } },
+                
+            };
+            var metadata = new Metadata(variables);
+            var x = new MetadataWriter(new BinaryWriter(ms), metadata);
+
+            // Act
+            x.EnsureValidVariables();
+
+            //Assert
+            Assert.Equal(64, metadata.Variables.Single().Name.Length);
+            Assert.Equal(120, metadata.Variables.Single().ValueLabels!.Single().Value.Length);
         }
 
         [Fact]
