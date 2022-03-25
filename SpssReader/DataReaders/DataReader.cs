@@ -68,6 +68,7 @@ namespace Spss.DataReaders
         private static byte[] Combine(byte[][] arrays)
         {
             var len = arrays.Length * 8 / 256 * 255 + arrays.Length * 8 % 256;
+            if (len == 255) len = 256;
             byte[] rv = new byte[len];
             var offset = 0;
             for (var i = 0; i < arrays.Length; i++)
