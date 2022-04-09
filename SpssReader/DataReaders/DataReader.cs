@@ -67,14 +67,16 @@ namespace Spss.DataReaders
 
         private static byte[] Combine(byte[][] arrays)
         {
-            var len = arrays.Length * 8 / 256 * 255 + arrays.Length * 8 % 256;
-            if (len == 255) len = 256;
-            byte[] rv = new byte[len];
+            var arraysLength = arrays.Length;
+            var len = arraysLength * 8 / 256 * 255 + arraysLength * 8 % 256;
+            if (arraysLength > 0 && arraysLength % 32 == 0)
+                len++; // the last block is always 8 bytes and is padded with a space
+            var rv = new byte[len];
             var offset = 0;
-            for (var i = 0; i < arrays.Length; i++)
+            for (var i = 0; i < arraysLength; i++)
             {
                 byte[] array = arrays[i];
-                Buffer.BlockCopy(array, 0, rv, offset, array.Length);
+                Buffer.BlockCopy(array, 0, rv, offset, array.Length); //todo: use span and long to speedup copy
                 offset += (i + 1) % 32 == 0 ? 7 : 8;
             }
 
@@ -99,10 +101,10 @@ namespace Spss.DataReaders
             var readBytes = _reader.ReadBytes(8);
             Debug.Assert(readBytes.Length == 8, "End of stream?");
             foreach (var code in readBytes)
-                if (code == CompressedCode.Padding) {}
+                if (code == CompressedCode.Padding) { }
                 else if (code == CompressedCode.Uncompressed) todo.Add(position++);
                 else if (code == CompressedCode.SpaceCharsBlock) _uncompressedBuffer[position++] = _spacesBytes;
-                else if (code == CompressedCode.SysMiss) _uncompressedBuffer[position++] = _sysMiss; 
+                else if (code == CompressedCode.SysMiss) _uncompressedBuffer[position++] = _sysMiss;
                 else if (code == CompressedCode.EndOfFile) break;
                 else _uncompressedBuffer[position++] = _metadataInfo.ConvertDouble(code - _metadataInfo.Metadata.Bias);
 

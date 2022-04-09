@@ -44,6 +44,11 @@ namespace SPSS.Tests
 {'Name':'V2','FormatType':5,'SpssWidth':8,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1}]},'Data':[
 'Er zijn 2 cli\u00EBnten waarvan de zorg in 2020 is be\u00EBindigd die zowel Jeugdhulp zonder verblijf, ambulante jeugdhulp op locatie van de aanbieder en Jeugdhulp met verblijf, verblijf bij een jeugdhulpaanbieder anders dan bovenstaand verblijf, ontvingen',1]}";
 
+        private const string Length255String = @"{'Metadata':{'Bias':100,'Cases':-1,'HeaderCodePage':65001,'DataCodePage':65001,'Variables':[
+{'Name':'V','FormatType':1,'SpssWidth':252,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':0,'MeasurementType':1},
+{'Name':'V2','FormatType':5,'SpssWidth':8,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1}]},'Data':[
+'Er zijn 2 cli\u00EBnten waarvan de zorg in 2020 is be\u00EBindigd die zowel Jeugdhulp zonder verblijf, ambulante jeugdhulp op locatie van de aanbieder en Jeugdhulp met verblijf, verblijf bij een jeugdhulpaanbieder anders dan bovenstaand verblijf, ontvingen.123456',1]}";
+
         private const string Custom1 = @"{'Metadata':{'Bias':100,'Cases':-1,'HeaderCodePage':65001,'DataCodePage':65001,'Variables':[
 {'Name':'V1','FormatType':1,'SpssWidth':8,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':0,'MeasurementType':1},
 {'Name':'V2','FormatType':5,'SpssWidth':8,'DecimalPlaces':0,'Label':null,'ValueLabels':null,'MissingValueType':0,'MissingValues':[],'Columns':5,'Alignment':1,'MeasurementType':1},
@@ -197,6 +202,28 @@ namespace SPSS.Tests
             var spssData2 = SpssReader.Read(ms);
             var result = JsonSerializer.Serialize(spssData2).Replace("\"", "'");
             Assert.Equal(Length248String.Replace(Environment.NewLine, ""), result);
+        }
+
+        [Fact]
+        public void CanWrite255ByteString()
+        {
+            // Assign
+            var variables = new List<Variable>
+            {
+                new Variable<string>("V" , 255) ,
+                new Variable<double>("V2" , 8) 
+            };
+            var ms = new MemoryStream();
+
+            // Act
+            SpssWriter.Write(variables, new List<object?> { "Er zijn 2 cliënten waarvan de zorg in 2020 is beëindigd die zowel Jeugdhulp zonder verblijf, ambulante jeugdhulp op locatie van de aanbieder en Jeugdhulp met verblijf, verblijf bij een jeugdhulpaanbieder anders dan bovenstaand verblijf, ontvingen.12345678",1.0 }, ms);
+
+            // Assert
+            SaveToFile(ms, "255ByteString");
+            ms.Position = 0;
+            var spssData2 = SpssReader.Read(ms);
+            var result = JsonSerializer.Serialize(spssData2).Replace("\"", "'");
+            Assert.Equal(Length255String.Replace(Environment.NewLine, ""), result);
         }
 
         [Fact]
