@@ -32,6 +32,7 @@ steps:
 
 - script: |
     call dotnet tool install -g dotnet-reportgenerator-globaltool
+    call where reportgenerator
     call reportgenerator -reports:$(Build.SourcesDirectory)\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines;Cobertura
   displayName: "Generate Coverage result"
   enabled: "true"
