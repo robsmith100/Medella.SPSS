@@ -24,31 +24,50 @@ Since forking there are a lot of bug fixing for utf8 support, added
 * string valuesLabels 
 * string missing.
 * BigEndian
+* Improved spssReader performance by 3000%
 
 The libriary is refactored to a cleancode library
 
 ### To read a data file:
 
 ```C#
-    var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
+    using var fileStream = new FileStream("TestFiles/test.sav", FileMode.Open);
 
-    var spssData = SpssReader.Read(fileStream);
+    var spssReader = new SpssReader(fileStream);
 
-    var variables = spssData.Metadata.Variables;
-    foreach (var variable in variables)
+    var rowReader = spssReader.RowReader;
+    foreach (var column in rowReader.Columns)
     {
-        Console.WriteLine($"{variable.Name}, {variable.Label}");
-        if (variable.ValueLabels != null)
-            Console.WriteLine(string.Join(",", variable.ValueLabels.Select(x => $"{x.Key} - {x.Value} ")));
-        Console.WriteLine(string.Join(",", variable.MissingValues));
+        Console.WriteLine($"{column.Variable.Name}, {column.Variable.Label}");
+        if (column.Variable.ValueLabels != null)
+            Console.WriteLine(string.Join(",", column.Variable.ValueLabels.Select(x => $"{x.Key} - {x.Value} ")));
+        Console.WriteLine(string.Join(",", column.Variable.MissingValues));
     }
-
-    for (var i = 0; i < spssData.Data.Count; i++)
+    while (rowReader.ReadRow())
     {
-        var obj = spssData.Data[i];
-        Console.WriteLine($"{variables[i % variables.Count].Name}={obj}");
+        foreach (var column in rowReader.Columns)
+        {
+            Console.WriteLine($"{column.Variable.Name}={column.GetValue()}");
+            // OR without boxing
+            switch (column.ColumnType)
+            {
+                case ColumnType.String:
+                    Console.WriteLine($"{column.Variable.Name}={column.GetString()}");
+                    break;
+                case ColumnType.Double:
+                    Console.WriteLine($"{column.Variable.Name}={column.GetDouble()}");
+                    break;
+                case ColumnType.Int:
+                    Console.WriteLine($"{column.Variable.Name}={column.GetInt()}");
+                    break;
+                case ColumnType.Date:
+                    Console.WriteLine($"{column.Variable.Name}={column.GetDate()}");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
-}
 ```
 
 ### To write a data file:
