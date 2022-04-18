@@ -9,6 +9,10 @@ namespace Spss.SpssMetadata
         ///     Creates Metadata with defaults.
         ///     bias=100 &amp; encodings=UTF8
         /// </summary>
+        public Metadata() : this(new List<Variable>())
+        {
+        }
+
         public Metadata(List<Variable> variables)
         {
             // Default values
@@ -45,6 +49,6 @@ namespace Spss.SpssMetadata
         /// <summary>
         ///     Variable used
         /// </summary>
-        public List<Variable> Variables { get; set; }
+        public List<Variable> Variables { get; private set; }
     }
 }

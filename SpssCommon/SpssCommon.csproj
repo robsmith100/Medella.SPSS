@@ -2,11 +2,12 @@
 
     <PropertyGroup>
         <Nullable>enable</Nullable>
-		<TargetFrameworks>netstandard2.1;net6.0</TargetFrameworks>
+		<TargetFrameworks>net6.0</TargetFrameworks>
 	    <RootNamespace>Spss</RootNamespace>
         <PackageProjectUrl>https://github.com/Anderman/Medella.SPSS</PackageProjectUrl>
         <RepositoryUrl>https://github.com/Anderman/Medella.SPSS</RepositoryUrl>
 	    <Description>A cleancode library used by reading and writing spss .sav files</Description>
+	    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
 </Project>

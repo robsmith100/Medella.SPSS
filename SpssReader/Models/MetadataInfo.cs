@@ -14,7 +14,5 @@ namespace Spss.Models
         public List<DisplayParameter> DisplayParameters { get; set; } = new List<DisplayParameter>();
         public byte[]? LongVariableNames { get; set; }
         public byte[]? ValueLengthVeryLongString { get; set; }
-        public int Compressed { get; set; }
-        public bool IsLittleEndian { get; set; } = true;
     }
 }

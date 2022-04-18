@@ -18,7 +18,10 @@ namespace Spss.SpssMetadata
         public FormatType FormatType { get; set; } = FormatType.A;
 
         /// <summary>
-        ///     Spss Width (Max valueLength in bytes for strings, number of digit for numbers and format type for date)
+        ///     Spss Width
+        ///     string: Max valueLength in bytes
+        ///     number: number of digit
+        ///     date: length of date format
         /// </summary>
         public int SpssWidth { get; set; } = 1;
 

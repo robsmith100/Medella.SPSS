@@ -1,40 +1,46 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Spss.DataReaders;
 using Spss.MetadataReaders;
 using Spss.Models;
 using Spss.SpssMetadata;
 
-namespace Spss
+namespace Spss;
+
+public class SpssReader
 {
-    public class SpssReader : IDisposable
+    private readonly DataReader _dataReader;
+    private readonly MetadataInfo _metaDataInfo = new() { Metadata = new Metadata() };
+    private readonly MetadataReader _metadataReader;
+    private Metadata? _metadata;
+    private RowReader? _rowReader;
+
+
+    public SpssReader(Stream fileStream)
     {
-        private readonly DataReader _dataReader;
-        private readonly MetadataInfo _metaData = new MetadataInfo { Metadata = new Metadata(new List<Variable>()) };
-        private readonly MetadataReader _metadataReader;
-        private readonly Reader _reader;
+        var reader = new Reader(fileStream);
+        _metadataReader = new MetadataReader(reader, _metaDataInfo);
+        _dataReader = new DataReader(reader, _metaDataInfo.Metadata.Variables);
+    }
+
+    public Metadata Metadata => _metadata ??= _metadataReader.Read();
+    public RowReader RowReader => _rowReader ??= GetRowReader();
 
 
-        private SpssReader(Stream fileStream)
-        {
-            _reader = new Reader(fileStream, _metaData);
-            _metadataReader = new MetadataReader(_reader, _metaData);
-            _dataReader = new DataReader(_reader, _metaData);
-        }
+    public static SpssData Read(Stream stream)
+    {
+        var reader = new SpssReader(stream);
+        var metadata = reader.Metadata;
+        var data = new List<object?>();
+        while (reader.RowReader.ReadRow()) data.AddRange(reader.RowReader.Columns.Select(column => column.GetValue()));
 
-        public void Dispose()
-        {
-            _reader.Dispose();
-        }
+        return new SpssData { Metadata = metadata, Data = data };
+    }
 
-        public static SpssData Read(Stream stream)
-        {
-            var reader = new SpssReader(stream);
-            var metadata = reader._metadataReader.Read();
-            var data = reader._dataReader.Read();
-            reader.Dispose();
-            return new SpssData { Metadata = metadata.Metadata, Data = data };
-        }
+    private RowReader GetRowReader()
+    {
+        _metadata ??= _metadataReader.Read();
+        return _rowReader ??= _dataReader.CreateRowReader();
     }
 }

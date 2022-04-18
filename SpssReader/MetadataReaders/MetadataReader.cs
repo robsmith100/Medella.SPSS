@@ -1,8 +1,10 @@
 using System;
+using System.Text;
 using Spss.FileStructure;
 using Spss.MetadataReaders.Convertors;
 using Spss.MetadataReaders.RecordReaders;
 using Spss.Models;
+using Spss.SpssMetadata;
 
 namespace Spss.MetadataReaders
 {
@@ -21,7 +23,7 @@ namespace Spss.MetadataReaders
             _recordTypeInfoReader = new RecordTypeInfoReader(reader, _metadataInfo);
         }
 
-        public MetadataInfo Read()
+        public Metadata Read()
         {
             while (true)
             {
@@ -29,27 +31,28 @@ namespace Spss.MetadataReaders
                 if (recordType == 0x02000000)
                 {
                     recordType = 2;
-                    _metadataInfo.IsLittleEndian = false;
+                    _reader.FileIsLittleEndian = false;
                 }
 
                 GetRecordTypeReader(recordType)();
-                if (recordType == (int) RecordType.EndRecord) break;
+                if (recordType == (int)RecordType.EndRecord) break;
             }
 
-            new MetadataConvertor(_metadataInfo).Convert();
-            return _metadataInfo;
+            new MetadataConvertor(_metadataInfo, _reader.IsEndianCorrect).Convert();
+            _reader.DataEncoding = Encoding.GetEncoding(_metadataInfo.Metadata.DataCodePage);
+            return _metadataInfo.Metadata;
         }
 
         private Action GetRecordTypeReader(int recordType)
         {
             return recordType switch
             {
-                (int) RecordType.HeaderRecord => _recordTypeReader.ReadHeaderRecord,
-                (int) RecordType.VariableRecord => _recordTypeReader.ReadVariableRecord,
-                (int) RecordType.ValueLabelRecord => _recordTypeReader.ReadValueLabelRecord,
-                (int) RecordType.InfoRecord => _recordTypeInfoReader.ReadInfoRecord(),
-                (int) RecordType.EndRecord => _recordTypeReader.ReadEndRecord,
-                _ => throw new InvalidOperationException($"Unknown recordType {recordType:x8} at pos {_reader.BaseStream.Position - 4:x8}")
+                (int)RecordType.HeaderRecord => _recordTypeReader.ReadHeaderRecord,
+                (int)RecordType.VariableRecord => _recordTypeReader.ReadVariableRecord,
+                (int)RecordType.ValueLabelRecord => _recordTypeReader.ReadValueLabelRecord,
+                (int)RecordType.InfoRecord => _recordTypeInfoReader.ReadInfoRecord(),
+                (int)RecordType.EndRecord => _recordTypeReader.ReadEndRecord,
+                _ => throw new InvalidOperationException($"Unknown recordType {recordType:x8} {_reader.GetErrorInfo(-4)}")
             };
         }
     }

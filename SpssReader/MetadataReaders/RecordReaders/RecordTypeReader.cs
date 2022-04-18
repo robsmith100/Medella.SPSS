@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using Spss.DataReaders;
 using Spss.FileStructure;
 using Spss.Models;
 using Spss.SpssMetadata;
@@ -23,19 +23,21 @@ namespace Spss.MetadataReaders.RecordReaders
 
         public void ReadEndRecord()
         {
-            _reader.BaseStream.Seek(4, SeekOrigin.Current);
+            _reader.Seek(4);
         }
 
 
         public void ReadHeaderRecord()
         {
-            _reader.BaseStream.Seek(60 + 4, SeekOrigin.Current);
-            _reader.ReadInt32();
-            _metadataInfo.Compressed = _reader.ReadInt32();
-            _reader.ReadInt32();
+            _reader.Seek(60);
+            var headerCode = _reader.ReadInt32();
+            _reader.FileIsLittleEndian = headerCode != 0x02000000;
+            _reader.Seek(4);
+            _reader.CompressedType = (CompressedType)_reader.ReadInt32();
+            _reader.Seek(4);
             _metadataInfo.Metadata.Cases = _reader.ReadInt32();
-            _metadataInfo.Metadata.Bias = (int) _reader.ReadDouble();
-            _reader.BaseStream.Seek(17 + 64 + 3, SeekOrigin.Current);
+            _metadataInfo.Metadata.Bias = (_reader.Bias = (int)_reader.ReadDouble());
+            _reader.Seek(17 + 64 + 3);
         }
 
         public void ReadValueLabelRecord()
@@ -48,7 +50,7 @@ namespace Spss.MetadataReaders.RecordReaders
                 var length = _reader.ReadByte();
                 var label = _reader.ReadBytes(length);
                 _reader.ReadBytes((length + 1 + 7) / 8 * 8 - (length + 1));
-                labels.Add((value, label));
+                labels.Add((value.ToArray(), label.ToArray()));
             }
 
             _reader.ReadInt32();
@@ -69,7 +71,7 @@ namespace Spss.MetadataReaders.RecordReaders
             _reader.ReadByte();
             var shortName = _reader.ReadBytes(8);
 
-            var properties = new VariableProperties { FormatType = (FormatType) formatType, Index = _currentIndex, MissingValueType = missingValueType, ShortName = shortName, DecimalPlaces = decimalPlaces };
+            var properties = new VariableProperties { FormatType = (FormatType)formatType, Index = _currentIndex, MissingValueType = missingValueType, ShortName = shortName.ToArray(), DecimalPlaces = decimalPlaces };
             if (hasVariableLabel)
                 properties.Label = ReadLabel();
             if (Math.Abs(missingValueType) != 0)
@@ -78,14 +80,14 @@ namespace Spss.MetadataReaders.RecordReaders
             var blockWidth = ReadBlankRecords(valueLength);
 
             properties.ValueLength = blockWidth;
-            properties.SpssWidth = formatType == (int) FormatType.A ? blockWidth : spssWidth;
+            properties.SpssWidth = formatType == (int)FormatType.A ? blockWidth : spssWidth;
             _metadataInfo.Variables.Add(properties);
             _currentIndex += SpssMath.GetNumberOf32ByteBlocks(blockWidth);
         }
 
         private void ReadMissing(VariableProperties properties)
         {
-            properties.Missing = Enumerable.Range(0, Math.Abs(properties.MissingValueType)).Select(_ => _reader.ReadBytes(8)).ToArray();
+            properties.Missing = Enumerable.Range(0, Math.Abs(properties.MissingValueType)).Select(_ => _reader.ReadBytes(8).ToArray()).ToArray();
         }
 
         private byte[] ReadLabel()
@@ -93,7 +95,7 @@ namespace Spss.MetadataReaders.RecordReaders
             var length = _reader.ReadInt32();
             var label = _reader.ReadBytes(length);
             _reader.ReadBytes((length + 3) / 4 * 4 - length);
-            return label;
+            return label.ToArray();
         }
 
         private int ReadBlankRecords(int valueLength)
@@ -103,7 +105,7 @@ namespace Spss.MetadataReaders.RecordReaders
             var skip = SpssMath.GetAllocatedSize(valueLength);
             lengthTotal += skip == 256 ? 252 : valueLength;
             skip -= 8;
-            _reader.BaseStream.Seek(skip * 4, SeekOrigin.Current);
+            _reader.Seek(skip * 4);
             return lengthTotal;
         }
     }
