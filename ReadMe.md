@@ -20,11 +20,12 @@ Install-Package SpssWriter
 ```
 
 It's a fork of [SPSS-.NET-Reader](https://github.com/fbiagi/SPSS-.NET-Reader) by fbiagi (based on [spsslib-80132](http://spsslib.codeplex.com/) by elmarj).
-Since forking there are a lot of bug fixing for utf8 support, added 
+Since forking there are a lot of bug fixing for utf8 support.
+Added :
 * string valuesLabels 
 * string missing.
 * BigEndian
-* Improved spssReader performance by 3000%
+* Improved spssReader performance by 4000%
 
 The libriary is refactored to a cleancode library
 
