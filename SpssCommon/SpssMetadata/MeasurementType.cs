@@ -1,23 +1,22 @@
-﻿namespace Spss.SpssMetadata
+﻿namespace Spss.SpssMetadata;
+
+/// <summary>
+///     The measurement type of the variable
+/// </summary>
+public enum MeasurementType
 {
     /// <summary>
-    ///     The measurement type of the variable
+    ///     Nominal scale fixed set of values no order
     /// </summary>
-    public enum MeasurementType
-    {
-        /// <summary>
-        ///     Nominal scale
-        /// </summary>
-        Nominal = 1,
+    Nominal = 1,
 
-        /// <summary>
-        ///     Ordinal scale
-        /// </summary>
-        Ordinal = 2,
+    /// <summary>
+    ///     Ordinal scale fixed set of values with order
+    /// </summary>
+    Ordinal = 2,
 
-        /// <summary>
-        ///     Continuous scale
-        /// </summary>
-        Scale = 3
-    }
+    /// <summary>
+    ///     Continuous scale
+    /// </summary>
+    Scale = 3
 }

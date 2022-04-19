@@ -132,8 +132,7 @@ public class RecordTypeInfoReader
 
     private void ReadMachineIntegerRecord()
     {
-        _metaDataStreamReader.Seek(4 + 4 + 7 * 4); //skip size+count+7 fields
-        //_metaDataStreamReader.FileIsLittleEndian = _metaDataStreamReader.ReadInt32() == 2; // 1 == BigEndian
+        _metaDataStreamReader.Seek(4 + 4 + 7 * 4); //skip size+count+7 fields //skip (also skip field 7 Endian)
         _metadataInfo.Metadata.DataCodePage = _metadataInfo.Metadata.HeaderCodePage = _metaDataStreamReader.ReadInt32().GetCodePage();
         _metaDataStreamReader.DataEncoding = Encoding.GetEncoding(_metadataInfo.Metadata.DataCodePage);
     }

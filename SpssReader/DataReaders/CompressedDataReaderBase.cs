@@ -9,15 +9,7 @@ namespace Spss.DataReaders;
 
 public abstract class CompressedDataReaderBase : IDataReader
 {
-    protected readonly byte[] CompressedBlock = new byte[8];
-    protected readonly Stream Stream;
-    protected readonly byte[] Buffer = new byte[1024 * 1024 * 10];
-    protected int BufferLength;
-    protected int CompressedBlockIndex = 8;
     private bool _endOfStream;
-    public int Bias;
-    protected int BufferIndex;
-    public Encoding DataEncoding { get; init; }
 
     protected CompressedDataReaderBase(Stream stream, Encoding encoding, int bias)
     {
@@ -29,11 +21,24 @@ public abstract class CompressedDataReaderBase : IDataReader
         _endOfStream = stream.Position == stream.Length;
     }
 
+    protected byte[] Buffer { get; } = new byte[1024 * 1024 * 10];
+    protected byte[] CompressedBlock { get; } = new byte[8];
+    protected Stream Stream { get; }
+    public int Bias { get; }
+    protected int BufferIndex { get; set; }
+    protected int BufferLength { get; set; }
+    protected int CompressedBlockIndex { get; set; } = 8;
+
+    public Encoding DataEncoding { get; init; }
+
     public bool IsEof()
     {
         if (!_endOfStream) return false;
+
         if (BufferIndex != BufferLength) return false;
+
         if (CompressedBlockIndex == 8) return true;
+
         return CompressedBlock[CompressedBlockIndex] == CompressedCode.Padding || CompressedBlock[CompressedBlockIndex] == CompressedCode.EndOfFile;
     }
 
@@ -53,20 +58,22 @@ public abstract class CompressedDataReaderBase : IDataReader
         switch (code)
         {
             case CompressedCode.Uncompressed:
-                {
-                    EnsureBuffer(8);
-                    var value = MemoryMarshal.Read<long>(Buffer.AsSpan().Slice(BufferIndex, 8));
-                    doubleValue = BitConverter.Int64BitsToDouble(value);
-                    intValue = null;
-                    BufferIndex += 8;
-                    return;
-                }
+            {
+                EnsureBuffer(8);
+                var value = MemoryMarshal.Read<long>(Buffer.AsSpan().Slice(BufferIndex, 8));
+                doubleValue = BitConverter.Int64BitsToDouble(value);
+                intValue = null;
+                BufferIndex += 8;
+                return;
+            }
+
             case CompressedCode.SysMiss:
-                {
-                    intValue = null;
-                    doubleValue = null;
-                    return;
-                }
+            {
+                intValue = null;
+                doubleValue = null;
+                return;
+            }
+
             case CompressedCode.SpaceCharsBlock:
             case CompressedCode.Padding:
             case CompressedCode.EndOfFile:
@@ -88,12 +95,12 @@ public abstract class CompressedDataReaderBase : IDataReader
         for (var i = 0; i < blocks; i++)
         {
             if (!ReadString(strArray[pos..])) continue;
+
             pos += (i + 1) % 32 == 0 ? 7 : 8;
         }
 
         return GetTrimmedStringLength(strArray, pos);
     }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool ReadString(Span<byte> destination)
@@ -115,12 +122,13 @@ public abstract class CompressedDataReaderBase : IDataReader
                 //MemoryMarshal.Write(destination, ref spaceBytes);
                 return false;
             case CompressedCode.Uncompressed:
-                {
-                    var bytes = MemoryMarshal.Read<long>(Buffer.AsSpan().Slice(BufferIndex, 8));
-                    MemoryMarshal.Write(destination, ref bytes);
-                    BufferIndex += 8;
-                    return true;
-                }
+            {
+                var bytes = MemoryMarshal.Read<long>(Buffer.AsSpan().Slice(BufferIndex, 8));
+                MemoryMarshal.Write(destination, ref bytes);
+                BufferIndex += 8;
+                return true;
+            }
+
             default:
                 // padding: is used at the end of a file and should not happen when reading a string
                 // SysMiss: string doesn't have sysMiss this way
@@ -141,8 +149,8 @@ public abstract class CompressedDataReaderBase : IDataReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected static int GetTrimmedStringLength(Span<byte> strArray, int pos)
     {
-        while (pos > 0 && strArray[pos - 1] == ' ')
-            pos--;
+        while (pos > 0 && strArray[pos - 1] == ' ') pos--;
+
         return pos;
     }
 
@@ -150,14 +158,14 @@ public abstract class CompressedDataReaderBase : IDataReader
     protected void EnsureBuffer(int length)
     {
         if (BufferIndex + length <= BufferLength || _endOfStream) return;
+
         FillBuffer();
     }
 
     private void FillBuffer()
     {
         var left = BufferLength - BufferIndex;
-        if (left > 0)
-            Buffer.AsSpan()[BufferIndex..].CopyTo(Buffer);
+        if (left > 0) Buffer.AsSpan()[BufferIndex..].CopyTo(Buffer);
 
         BufferLength = left + Stream.Read(Buffer.AsSpan()[left..]);
         _endOfStream = BufferLength < Buffer.Length;

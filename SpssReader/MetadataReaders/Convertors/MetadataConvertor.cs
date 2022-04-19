@@ -42,8 +42,8 @@ public class MetadataConvertor
     {
         var variable = Variable.Create(shortName, label == string.Empty ? null : label, properties.FormatType, properties.SpssWidth, properties.DecimalPlaces);
         variable.MissingValueType = (MissingValueType)properties.MissingValueType;
-        if (properties.Missing == null)
-            return variable;
+        if (properties.Missing == null) return variable;
+
         variable.MissingValues = variable.FormatType == FormatType.A
             ? properties.Missing.Select(y => (object)_encoding.GetString(y).TrimEnd()).ToArray()
             : properties.Missing.Select(y => (object)BitConverter.ToDouble(y)).ToArray();
@@ -113,6 +113,7 @@ public class MetadataConvertor
     private void UpdateVariableNames(Dictionary<string, Variable> variables)
     {
         if (_metadataInfo.LongVariableNames == null) return;
+
         var entries = _encoding.GetString(_metadataInfo.LongVariableNames).Split('\t');
         var longNames = entries.Select(x => x.Split('=')).Select(x => (shortName: x[0], longName: x[1])).ToList();
         longNames.ForEach(x => variables[x.shortName].Name = x.longName);
@@ -121,6 +122,7 @@ public class MetadataConvertor
     private void UpdateVariableValueLength(List<Variable> variables)
     {
         if (_metadataInfo.ValueLengthVeryLongString == null) return;
+
         var entries = _encoding.GetString(_metadataInfo.ValueLengthVeryLongString).Replace("\t", "").Split('\0', StringSplitOptions.RemoveEmptyEntries);
         var lengths = entries.Select(x => x.Split('=')).Select(x => (name: x[0], lentgh: int.Parse(x[1]))).ToDictionary(x => x.name, x => x.lentgh);
         foreach (var variable in variables)
@@ -135,6 +137,7 @@ public class MetadataConvertor
         foreach (var value in variables)
         {
             if (skip-- > 0) continue;
+
             result.Add(value);
             var length = value.SpssWidth;
             skip = length < 256 ? 0 : length / 252;
@@ -147,6 +150,7 @@ public class MetadataConvertor
     {
         var result = MemoryMarshal.Read<long>(bytes);
         if (!isEndianCorrect) result = BinaryPrimitives.ReverseEndianness(result);
+
         var int64BitsToDouble = BitConverter.Int64BitsToDouble(result);
         return int64BitsToDouble;
     }

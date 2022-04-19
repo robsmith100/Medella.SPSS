@@ -1,23 +1,22 @@
-﻿namespace Spss.SpssMetadata
+﻿namespace Spss.SpssMetadata;
+
+/// <summary>
+///     The alignment of the variable for display purposes
+/// </summary>
+public enum Alignment
 {
     /// <summary>
-    ///     The alignment of the variable for display purposes
+    ///     Left aligned
     /// </summary>
-    public enum Alignment
-    {
-        /// <summary>
-        ///     Left aligned
-        /// </summary>
-        Left = 0,
+    Left = 0,
 
-        /// <summary>
-        ///     Right aligned
-        /// </summary>
-        Right = 1,
+    /// <summary>
+    ///     Right aligned
+    /// </summary>
+    Right = 1,
 
-        /// <summary>
-        ///     Center aligned
-        /// </summary>
-        Centre = 2
-    }
+    /// <summary>
+    ///     Center aligned
+    /// </summary>
+    Centre = 2
 }

@@ -12,10 +12,9 @@ public class SpssReader
 {
     private readonly MetadataInfo _metaDataInfo = new() { Metadata = new Metadata() };
     private readonly MetadataReader _metadataReader;
+    private readonly MetaDataStreamReader _metaDataStreamReader;
     private Metadata? _metadata;
     private RowReader? _rowReader;
-    private readonly MetaDataStreamReader _metaDataStreamReader;
-
 
     public SpssReader(Stream fileStream)
     {
@@ -25,7 +24,6 @@ public class SpssReader
 
     public Metadata Metadata => _metadata ??= _metadataReader.Read();
     public RowReader RowReader => _rowReader ??= GetRowReader();
-
 
     public static SpssData Read(Stream stream)
     {

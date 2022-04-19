@@ -5,15 +5,12 @@ using Spss.FileStructure;
 using Spss.SpssMetadata;
 
 // ReSharper disable CompareOfFloatsByEqualityOperator
-
 namespace Spss.DataReaders;
 
 public class Column
 {
-    private readonly Encoding _encoding;
-    public readonly Variable Variable;
     private readonly IDataReader _dataReader;
-    public readonly ColumnType ColumnType;
+    private readonly Encoding _encoding;
     private readonly int _spssWidth;
     private readonly byte[] _strArray = null!;
     private double? _doubleValue;
@@ -29,7 +26,7 @@ public class Column
         if (variable.FormatType == FormatType.A)
         {
             ColumnType = ColumnType.String;
-            _strArray = new byte[variable.SpssWidth + 8];// Extra space for padding
+            _strArray = new byte[variable.SpssWidth + 8]; // Extra space for padding
             GetString = () => _strLength == 0 ? null : _encoding.GetString(_strArray.AsSpan()[.._strLength]);
             GetInt = () => TryGetString(out var str) && int.TryParse(str, out var value) ? value : null;
             GetDate = () => TryGetString(out var str) && DateTime.TryParse(str, out var value) ? value : null;
@@ -66,7 +63,8 @@ public class Column
         }
     }
 
-
+    public ColumnType ColumnType { get; init; }
+    public Variable Variable { get; init; }
     public Func<string?> GetString { get; internal set; } = () => throw new NotImplementedException();
     public Func<int?> GetInt { get; internal set; } = () => throw new NotImplementedException();
     public Func<double?> GetDouble { get; internal set; } = () => throw new NotImplementedException();

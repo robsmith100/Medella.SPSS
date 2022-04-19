@@ -1,28 +1,42 @@
 using System.Text;
 
-namespace Spss.Encodings
+namespace Spss.Encodings;
+
+public class RemoveReplacementCharEncoderFallback : EncoderFallback
 {
-    public class RemoveReplacementCharEncoderFallback : EncoderFallback
+    public override int MaxCharCount => 0;
+
+    public override EncoderFallbackBuffer CreateFallbackBuffer()
     {
-        public override int MaxCharCount => 0;
+        return new RemoveReplacementCharEncoderFallbackBuffer();
+    }
 
-        public override EncoderFallbackBuffer CreateFallbackBuffer() => new RemoveReplacementCharEncoderFallbackBuffer();
+    public class RemoveReplacementCharEncoderFallbackBuffer : EncoderFallbackBuffer
+    {
+        public override int Remaining => 0;
 
-        public class RemoveReplacementCharEncoderFallbackBuffer : EncoderFallbackBuffer
+        public override bool Fallback(char unknownChar, int index)
         {
-            public override int Remaining => 0;
+            return true;
+        }
 
-            public override bool Fallback(char unknownChar, int index) => true;
+        public override bool Fallback(char charUnknownHigh, char charUnknownLow, int index)
+        {
+            return false;
+        }
 
-            public override bool Fallback(char charUnknownHigh, char charUnknownLow, int index) => false;
+        public override char GetNextChar()
+        {
+            return default;
+        }
 
-            public override char GetNextChar() => default(char);
+        public override bool MovePrevious()
+        {
+            return false;
+        }
 
-            public override bool MovePrevious() => false;
-
-            public override void Reset()
-            {
-            }
+        public override void Reset()
+        {
         }
     }
 }

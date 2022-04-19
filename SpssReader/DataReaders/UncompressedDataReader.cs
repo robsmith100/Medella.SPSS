@@ -1,11 +1,10 @@
-using Spss.DataReaders;
 using System;
 using System.Buffers.Binary;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Spss;
+namespace Spss.DataReaders;
 
 public class UncompressedDataReader : CompressedDataReaderBase, IDataReader
 {

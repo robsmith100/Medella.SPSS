@@ -30,20 +30,20 @@ public sealed class EndianCompressedDataReader : CompressedDataReaderBase
         switch (code)
         {
             case CompressedCode.Uncompressed:
-                {
-                    EnsureBuffer(8);
-                    var value = MemoryMarshal.Read<long>(Buffer.AsSpan().Slice(BufferIndex, 8));
-                    doubleValue = BitConverter.Int64BitsToDouble(BinaryPrimitives.ReverseEndianness(value));
-                    intValue = null;
-                    BufferIndex += 8;
-                    return;
-                }
+            {
+                EnsureBuffer(8);
+                var value = MemoryMarshal.Read<long>(Buffer.AsSpan().Slice(BufferIndex, 8));
+                doubleValue = BitConverter.Int64BitsToDouble(BinaryPrimitives.ReverseEndianness(value));
+                intValue = null;
+                BufferIndex += 8;
+                return;
+            }
             case CompressedCode.SysMiss:
-                {
-                    intValue = null;
-                    doubleValue = null;
-                    return;
-                }
+            {
+                intValue = null;
+                doubleValue = null;
+                return;
+            }
             case CompressedCode.SpaceCharsBlock:
             case CompressedCode.Padding:
             case CompressedCode.EndOfFile:
