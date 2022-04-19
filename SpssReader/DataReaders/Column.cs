@@ -12,7 +12,7 @@ public class Column
 {
     private readonly Encoding _encoding;
     public readonly Variable Variable;
-    private readonly Reader _reader;
+    private readonly IDataReader _dataReader;
     public readonly ColumnType ColumnType;
     private readonly int _spssWidth;
     private readonly byte[] _strArray = null!;
@@ -20,12 +20,11 @@ public class Column
     private int? _intValue;
     private int _strLength;
 
-    public Column(Variable variable, Reader reader)
+    public Column(Variable variable, IDataReader dataReader)
     {
         Variable = variable;
-        _reader = reader;
-        _encoding = reader.DataEncoding;
-        ReadValue = reader.CompressedType == CompressedType.Compressed ? ReadValueCompressed : ReadValueUnCompressed;
+        _dataReader = dataReader;
+        _encoding = dataReader.DataEncoding;
         _spssWidth = variable.SpssWidth;
         if (variable.FormatType == FormatType.A)
         {
@@ -68,42 +67,23 @@ public class Column
     }
 
 
-    internal Action ReadValue { get; set; }
     public Func<string?> GetString { get; internal set; } = () => throw new NotImplementedException();
     public Func<int?> GetInt { get; internal set; } = () => throw new NotImplementedException();
     public Func<double?> GetDouble { get; internal set; } = () => throw new NotImplementedException();
     public Func<DateTime?> GetDate { get; internal set; } = () => throw new NotImplementedException();
 
-    private void ReadValueUnCompressed()
-    {
-        switch (ColumnType)
-        {
-            case ColumnType.String:
-                _strLength = _reader.ReadString(_strArray.AsSpan(), _spssWidth);
-                break;
-            case ColumnType.Date:
-            case ColumnType.Double:
-            case ColumnType.Int:
-                _doubleValue = _reader.ReadDouble();
-                if (_doubleValue == double.MinValue) _doubleValue = null;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    private void ReadValueCompressed()
+    internal void ReadValue()
     {
         switch (ColumnType)
         {
             case ColumnType.String:
-                _strLength = _reader.ReadStringCompressed(_strArray.AsSpan(), _spssWidth);
+                _strLength = _dataReader.ReadString(_strArray.AsSpan(), _spssWidth);
                 break;
             case ColumnType.Date:
             case ColumnType.Double:
             case ColumnType.Int:
-                _reader.ReadNumberCompressed(ref _doubleValue, ref _intValue);
+                _dataReader.ReadNumber(out _doubleValue, out _intValue);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -112,19 +92,14 @@ public class Column
 
     public object? GetValue()
     {
-        switch (ColumnType)
+        return ColumnType switch
         {
-            case ColumnType.String:
-                return GetString();
-            case ColumnType.Int:
-            case ColumnType.Double:
-                return GetDouble();
-            //return GetInt();
-            case ColumnType.Date:
-                return GetDate();
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+            ColumnType.String => GetString(),
+            ColumnType.Int => GetDouble(),
+            ColumnType.Double => GetDouble(),
+            ColumnType.Date => GetDate(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
     }
 }
 

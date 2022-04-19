@@ -1,59 +1,57 @@
 using System;
-using System.Text;
 using Spss.FileStructure;
 using Spss.MetadataReaders.Convertors;
 using Spss.MetadataReaders.RecordReaders;
 using Spss.Models;
 using Spss.SpssMetadata;
 
-namespace Spss.MetadataReaders
+namespace Spss.MetadataReaders;
+
+public class MetadataReader
 {
-    public class MetadataReader
+    private readonly MetadataInfo _metadataInfo;
+    private readonly MetaDataStreamReader _metaDataStreamReader;
+    private readonly RecordTypeInfoReader _recordTypeInfoReader;
+    private readonly RecordTypeReader _recordTypeReader;
+
+    public MetadataReader(MetaDataStreamReader metaDataStreamReader, MetadataInfo metadata)
     {
-        private readonly MetadataInfo _metadataInfo;
-        private readonly Reader _reader;
-        private readonly RecordTypeInfoReader _recordTypeInfoReader;
-        private readonly RecordTypeReader _recordTypeReader;
+        _metaDataStreamReader = metaDataStreamReader;
+        _metadataInfo = metadata;
+        _recordTypeReader = new RecordTypeReader(metaDataStreamReader, _metadataInfo);
+        _recordTypeInfoReader = new RecordTypeInfoReader(metaDataStreamReader, _metadataInfo);
+    }
 
-        public MetadataReader(Reader reader, MetadataInfo metadata)
+    public Metadata Read()
+    {
+        while (true)
         {
-            _reader = reader;
-            _metadataInfo = metadata;
-            _recordTypeReader = new RecordTypeReader(reader, _metadataInfo);
-            _recordTypeInfoReader = new RecordTypeInfoReader(reader, _metadataInfo);
-        }
-
-        public Metadata Read()
-        {
-            while (true)
+            var recordType = _metaDataStreamReader.ReadInt32();
+            if (recordType == 0x02000000)
             {
-                var recordType = _reader.ReadInt32();
-                if (recordType == 0x02000000)
-                {
-                    recordType = 2;
-                    _reader.FileIsLittleEndian = false;
-                }
-
-                GetRecordTypeReader(recordType)();
-                if (recordType == (int)RecordType.EndRecord) break;
+                recordType = 2;
+                _metaDataStreamReader.IsEndianCorrect = false;
             }
 
-            new MetadataConvertor(_metadataInfo, _reader.IsEndianCorrect).Convert();
-            _reader.DataEncoding = Encoding.GetEncoding(_metadataInfo.Metadata.DataCodePage);
-            return _metadataInfo.Metadata;
+            GetRecordTypeReader(recordType)();
+            if (recordType == (int)RecordType.EndRecord) break;
         }
 
-        private Action GetRecordTypeReader(int recordType)
+        new MetadataConvertor(_metadataInfo, _metaDataStreamReader.IsEndianCorrect).Convert();
+        return _metadataInfo.Metadata;
+    }
+
+    private Action GetRecordTypeReader(int recordType)
+    {
+        return recordType switch
         {
-            return recordType switch
-            {
-                (int)RecordType.HeaderRecord => _recordTypeReader.ReadHeaderRecord,
-                (int)RecordType.VariableRecord => _recordTypeReader.ReadVariableRecord,
-                (int)RecordType.ValueLabelRecord => _recordTypeReader.ReadValueLabelRecord,
-                (int)RecordType.InfoRecord => _recordTypeInfoReader.ReadInfoRecord(),
-                (int)RecordType.EndRecord => _recordTypeReader.ReadEndRecord,
-                _ => throw new InvalidOperationException($"Unknown recordType {recordType:x8} {_reader.GetErrorInfo(-4)}")
-            };
-        }
+            (int)RecordType.HeaderRecord2 => _recordTypeReader.ReadHeaderRecord,
+            (int)RecordType.HeaderRecord3 => _recordTypeReader.ReadHeaderRecord,
+            (int)RecordType.VariableRecord => _recordTypeReader.ReadVariableRecord,
+            (int)RecordType.ValueLabelRecord => _recordTypeReader.ReadValueLabelRecord,
+            (int)RecordType.InfoRecord => _recordTypeInfoReader.ReadInfoRecord(),
+            (int)RecordType.EndRecord => _recordTypeReader.ReadEndRecord,
+            _ => throw new InvalidOperationException($"Unknown recordType {recordType:x8}")
+        };
     }
 }

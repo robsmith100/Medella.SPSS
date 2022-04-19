@@ -35,7 +35,7 @@ namespace Spss.MetadataWriters.RecordWriters
         public void WriteHeaderRecord(Metadata metadata, List<VariableWrapper> variablesCount)
         {
             var count = variablesCount.Select(x => SpssMath.GetNumberOf32ByteBlocks(x.ValueLength)).Aggregate((result, blocks) => result + blocks);
-            _writer.Write((int) RecordType.HeaderRecord);
+            _writer.Write((int) RecordType.HeaderRecord2);
             _writer.Write(_encoding.GetPaddedValueAsByteArray("@(#) IBM SPSS STATISTICS MS Windows 25.0.0.0", 60));
             _writer.Write(2); //LayoutCode
             _writer.Write(count);

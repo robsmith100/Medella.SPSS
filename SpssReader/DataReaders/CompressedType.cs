@@ -1,7 +1,8 @@
 namespace Spss.DataReaders;
 
-public enum CompressedType
+public enum DataStreamContentType
 {
     UnCompressed = 0,
-    Compressed = 1
+    Compressed = 1,
+    Zlib = 2
 }

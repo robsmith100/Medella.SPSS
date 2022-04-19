@@ -6,23 +6,21 @@ namespace Spss.DataReaders;
 
 public class RowReader
 {
-    private readonly Reader _reader;
+    private readonly IDataReader _dataReader;
     public readonly List<Column> Columns;
 
-    public RowReader(List<Variable> variables, Reader reader)
+    public RowReader(List<Variable> variables, IDataReader dataReader)
     {
-        _reader = reader;
-        Columns = variables.Select(variable => new Column(variable, _reader)).ToList();
+        _dataReader = dataReader;
+        Columns = variables.Select(variable => new Column(variable, _dataReader)).ToList();
     }
 
     public bool ReadRow()
     {
-        if (_reader.IsEof())
+        if (_dataReader.IsEof())
             return false;
         foreach (var column in Columns)
-        {
             column.ReadValue();
-        }
         return true;
     }
 }

@@ -10,18 +10,17 @@ namespace Spss;
 
 public class SpssReader
 {
-    private readonly DataReader _dataReader;
     private readonly MetadataInfo _metaDataInfo = new() { Metadata = new Metadata() };
     private readonly MetadataReader _metadataReader;
     private Metadata? _metadata;
     private RowReader? _rowReader;
+    private readonly MetaDataStreamReader _metaDataStreamReader;
 
 
     public SpssReader(Stream fileStream)
     {
-        var reader = new Reader(fileStream);
-        _metadataReader = new MetadataReader(reader, _metaDataInfo);
-        _dataReader = new DataReader(reader, _metaDataInfo.Metadata.Variables);
+        _metaDataStreamReader = new MetaDataStreamReader(fileStream);
+        _metadataReader = new MetadataReader(_metaDataStreamReader, _metaDataInfo);
     }
 
     public Metadata Metadata => _metadata ??= _metadataReader.Read();
@@ -41,6 +40,6 @@ public class SpssReader
     private RowReader GetRowReader()
     {
         _metadata ??= _metadataReader.Read();
-        return _rowReader ??= _dataReader.CreateRowReader();
+        return _rowReader ??= new RowReader(_metadata.Variables, _metaDataStreamReader.CreateDataReader());
     }
 }
