@@ -37,4 +37,12 @@
 	  <ProjectReference Include="..\SpssReader\SpssReader.csproj" />
 	  <ProjectReference Include="..\SpssWriter\SpssWriter.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="TestFiles\zsav\customer_dbase.sav">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="TestFiles\zsav\customer_dbase.zsav">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

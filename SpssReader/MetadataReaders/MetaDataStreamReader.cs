@@ -25,11 +25,18 @@ public class MetaDataStreamReader
 
     public IDataReader CreateDataReader()
     {
-        if (DataStreamContentType == DataStreamContentType.UnCompressed) return new UncompressedDataReader(_stream, DataEncoding, IsEndianCorrect);
+        var s = _stream;
 
-        if (IsEndianCorrect) return new CompressedDataReader(_stream, DataEncoding, Bias);
+        if (DataStreamContentType == DataStreamContentType.Zlib)
+        {
+            s = new ZLibStreamReader(s);
+        }
 
-        return new EndianCompressedDataReader(_stream, DataEncoding, Bias);
+        if (DataStreamContentType == DataStreamContentType.UnCompressed) return new UncompressedDataReader(s, DataEncoding, IsEndianCorrect);
+
+        if (IsEndianCorrect) return new CompressedDataReader(s, DataEncoding, Bias);
+
+        return new EndianCompressedDataReader(s, DataEncoding, Bias);
     }
 
     public int ReadInt32()

@@ -77,6 +77,23 @@ null,null,'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     }
 
     [Fact]
+    public void ShouldCompareSavZSav()
+    {
+        // Assign
+        var fileStream1 = new FileStream("TestFiles/zsav/customer_dbase.sav", FileMode.Open);
+        var fileStream2 = new FileStream("TestFiles/zsav/customer_dbase.zsav", FileMode.Open);
+
+        // Act
+        var spssData1 = SpssReader.Read(fileStream1);
+        var spssData2 = SpssReader.Read(fileStream2);
+
+        // Assert
+        var result1 = JsonSerializer.Serialize(spssData1).Replace("\"", "'");
+        var result2 = JsonSerializer.Serialize(spssData2).Replace("\"", "'");
+        Assert.Equal(result1, result2);
+    }
+
+    [Fact]
     public void ShouldReadMissingValuesSav()
     {
         // Assign
