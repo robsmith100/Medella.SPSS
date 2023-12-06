@@ -40,6 +40,15 @@ public class RecordTypeReader
         _metaDataStreamReader.Bias = _metadataInfo.Metadata.Bias;
     }
 
+    public void ReadDocumentRecord()
+    {
+        var n_lines = _metaDataStreamReader.ReadInt32();
+        for (int i = 0; i < n_lines; i++)
+        {
+            _metaDataStreamReader.ReadBytes(80);
+        }
+    }
+
     public void ReadValueLabelRecord()
     {
         var count = _metaDataStreamReader.ReadInt32();

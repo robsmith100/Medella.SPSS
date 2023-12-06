@@ -47,6 +47,7 @@ public class MetadataReader
         {
             (int)RecordType.HeaderRecord2 => _recordTypeReader.ReadHeaderRecord,
             (int)RecordType.HeaderRecord3 => _recordTypeReader.ReadHeaderRecord,
+            (int)RecordType.DocumentRecord => _recordTypeReader.ReadDocumentRecord,
             (int)RecordType.VariableRecord => _recordTypeReader.ReadVariableRecord,
             (int)RecordType.ValueLabelRecord => _recordTypeReader.ReadValueLabelRecord,
             (int)RecordType.InfoRecord => _recordTypeInfoReader.ReadInfoRecord(),
